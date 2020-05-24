@@ -7,7 +7,6 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gorilla/mux v1.7.4
 	github.com/kr/fs v0.1.0 // indirect
-	github.com/tools/godep v0.0.0-20180126220526-ce0bfadeb516 // indirect
 	go.mongodb.org/mongo-driver v1.3.3
 	golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37
 )
