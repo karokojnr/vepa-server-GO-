@@ -10,6 +10,7 @@ import (
 	"vepa/model"
 	"vepa/util/db"
 
+	"github.com/AndroidStudyOpenSource/mpesa-api-go"
 	jwt "github.com/dgrijalva/jwt-go"
 	"go.mongodb.org/mongo-driver/bson"
 	"golang.org/x/crypto/bcrypt"
@@ -241,4 +242,46 @@ func UserVehiclesHandler(w http.ResponseWriter, r *http.Request) {
 	res.Error = err.Error()
 	json.NewEncoder(w).Encode(res)
 	return
+}
+
+// PaymentHandler is...
+func PaymentHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-TYpe", "application/json")
+	const (
+		appKey    = "WRnVsZ32lzmgQOVAoiANPAB9se2RYrB2"
+		appSecret = "ixv4HzhalH1fL9ry"
+	)
+	svc, err := mpesa.New(appKey, appSecret, mpesa.SANDBOX)
+	if err != nil {
+		panic(err)
+	}
+
+	res, err := svc.Simulation(mpesa.Express{
+		BusinessShortCode: "174379",
+		Password:          "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjAwNDIxMTc1NTU1",
+		Timestamp:         "20200421175555",
+		TransactionType:   "CustomerPayBillOnline",
+		Amount:            1,
+		PartyA:            "254799338805",
+		PartyB:            "174379",
+		PhoneNumber:       "254799338805",
+		CallBackURL:       "",
+		AccountReference:  "Vepa",
+		TransactionDesc:   "Vepa Payment",
+	})
+
+	if err != nil {
+		log.Println(err)
+	}
+	log.Println(res)
+}
+
+// CallBackHandler is...
+func CallBackHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-TYpe", "application/json")
+	fmt.Println("-----------Received M-Pesa webhook-----------")
+	// fmt.Println(req.body)
+	// fmt.Println(JSON.stringify(req.body.Body.stkCallback.ResultDesc))
+	fmt.Println("---------------------------------------------")
+
 }

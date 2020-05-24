@@ -1,7 +1,7 @@
 package model
 
 import "go.mongodb.org/mongo-driver/bson/primitive"
-
+// User is...
 type User struct {
 	ID          primitive.ObjectID `bson:"_id" json:"id,omitempty"`
 	Firstname   string             `json:"firstName"`
@@ -12,13 +12,18 @@ type User struct {
 	Password    string             `json:"password"`
 	Token       string             `json:"token"`
 }
+// Vehicle is...
 type Vehicle struct {
 	RegistrationNumber string `bson:"registrationNumber" json:"registrationNumber"`
 	VehicleClass       string `bson:"vehicleClass" json:"vehicleClass"`
 	VehicleModel       string `bson:"vehicleModel" json:"vehicleModel"`
 	UserID             string `bson:"userId" json:"userId"`
 }
-
+// Payment is...
+type Payment struct {
+	Amount string `bson:"amount" json:"amount"`
+}
+// ResponseResult is...
 type ResponseResult struct {
 	Error  string `json:"error"`
 	Result string `json:"result"`
