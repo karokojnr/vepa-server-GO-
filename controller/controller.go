@@ -11,6 +11,7 @@ import (
 	"vepa/util/db"
 
 	"github.com/AndroidStudyOpenSource/mpesa-api-go"
+	"github.com/appleboy/go-fcm"
 	jwt "github.com/dgrijalva/jwt-go"
 	"go.mongodb.org/mongo-driver/bson"
 	"golang.org/x/crypto/bcrypt"
@@ -148,6 +149,45 @@ func ProfileHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+// FCMTokenHandler is...
+func FCMTokenHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	tokenString := r.Header.Get("Authorization")
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		// Don't forget to validate the alg is what you expect:
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method")
+		}
+		return []byte("secret"), nil
+	})
+	var user model.User
+	var res model.ResponseResult
+
+	body, _ := ioutil.ReadAll(r.Body)
+	err = json.Unmarshal(body, &user)
+	collection, err := db.GetUserCollection()
+	if err != nil {
+		res.Error = err.Error()
+		json.NewEncoder(w).Encode(res)
+		return
+	}
+	var resultUser model.User
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		userID := claims["id"].(string)
+		filter := bson.M{"_id": userID}
+		update := bson.M{
+			"$set": bson.M{"fcmtoken": user.FCMToken},
+		}
+		result := collection.FindOneAndUpdate(context.TODO(), filter, update).Decode(&resultUser)
+		if result != nil {
+			fmt.Printf("FCMToken updated")
+		}
+		res.Result = "Something went wrong"
+		json.NewEncoder(w).Encode(res)
+		return
+	}
+}
+
 // AddVehicleHandler is...
 func AddVehicleHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-TYpe", "application/json")
@@ -207,7 +247,6 @@ func UserVehiclesHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return []byte("secret"), nil
 	})
-	// var vehicle model.Vehicle
 	var res model.ResponseResult
 	var results []*model.Vehicle
 	collection, err := db.GetVehicleCollection()
@@ -247,41 +286,114 @@ func UserVehiclesHandler(w http.ResponseWriter, r *http.Request) {
 // PaymentHandler is...
 func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-TYpe", "application/json")
-	const (
-		appKey    = "WRnVsZ32lzmgQOVAoiANPAB9se2RYrB2"
-		appSecret = "ixv4HzhalH1fL9ry"
-	)
-	svc, err := mpesa.New(appKey, appSecret, mpesa.SANDBOX)
-	if err != nil {
-		panic(err)
-	}
-
-	res, err := svc.Simulation(mpesa.Express{
-		BusinessShortCode: "174379",
-		Password:          "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjAwNDIxMTc1NTU1",
-		Timestamp:         "20200421175555",
-		TransactionType:   "CustomerPayBillOnline",
-		Amount:            1,
-		PartyA:            "254799338805",
-		PartyB:            "174379",
-		PhoneNumber:       "254799338805",
-		CallBackURL:       "https://vepa-server-go.herokuapp.com/rcb",
-		AccountReference:  "Vepa",
-		TransactionDesc:   "Vepa Payment",
+	tokenString := r.Header.Get("Authorization")
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		// Don't forget to validate the alg is what you expect:
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method")
+		}
+		return []byte("secret"), nil
 	})
-
+	var res model.ResponseResult
 	if err != nil {
-		log.Println(err)
+		res.Error = "Error, Try Again Later"
+		json.NewEncoder(w).Encode(res)
+		return
 	}
-	log.Println(res)
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		userID := claims["id"].(string)
+		fmt.Println(userID)
+		const (
+			appKey    = "WRnVsZ32lzmgQOVAoiANPAB9se2RYrB2"
+			appSecret = "ixv4HzhalH1fL9ry"
+		)
+		svc, err := mpesa.New(appKey, appSecret, mpesa.SANDBOX)
+		if err != nil {
+			panic(err)
+		}
+
+		res, err := svc.Simulation(mpesa.Express{
+			BusinessShortCode: "174379",
+			Password:          "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjAwNDIxMTc1NTU1",
+			Timestamp:         "20200421175555",
+			TransactionType:   "CustomerPayBillOnline",
+			Amount:            1,
+			PartyA:            "254799338805",
+			PartyB:            "174379",
+			PhoneNumber:       "254799338805",
+			CallBackURL:       "https://vepa-server-go.herokuapp.com/rcb",
+			AccountReference:  "Vepa",
+			TransactionDesc:   "Vepa Payment",
+		})
+
+		if err != nil {
+			log.Println(err)
+		}
+		log.Println(res)
+	}
+	res.Error = err.Error()
+	json.NewEncoder(w).Encode(res)
+	return
+
 }
 
 // CallBackHandler is...
 func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-TYpe", "application/json")
-	fmt.Println("-----------Received M-Pesa webhook-----------")
-	// fmt.Println(req.body)
-	// fmt.Println(JSON.stringify(req.body.Body.stkCallback.ResultDesc))
-	fmt.Println("---------------------------------------------")
+	tokenString := r.Header.Get("Authorization")
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		// Don't forget to validate the alg is what you expect:
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method")
+		}
+		return []byte("secret"), nil
+	})
+	var res model.ResponseResult
+	if err != nil {
+		res.Error = "Error, Try Again Later"
+		json.NewEncoder(w).Encode(res)
+		return
+	}
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		userID := claims["id"].(string)
+		fmt.Println(userID)
+		fmt.Println("-----------Received M-Pesa webhook-----------")
+		// fmt.Println(req.body)
+		// fmt.Println(JSON.stringify(req.body.Body.stkCallback.ResultDesc))
+		fmt.Println("---------------------------------------------")
+		// Create the message to be sent.
+		var user model.User
+		collection, err := db.GetUserCollection()
+		if err != nil {
+			log.Fatal(err)
+		}
+		err = collection.FindOne(context.TODO(), bson.M{"_id": user.ID}).Decode(&user)
+		if err != nil {
+			if err.Error() == "mongo: no documents in result" {
+				res.Result = "Something went wrong, Please try again later!"
+				json.NewEncoder(w).Encode(res)
+				return
+			}
+		}
+		msg := &fcm.Message{
+			To: user.FCMToken,
+			Data: map[string]interface{}{
+				"foo": "bar",
+			},
+		}
+		// Create a FCM client to send the message.
+		client, err := fcm.NewClient("AIzaSyABBYrj6YeQxxqbgIsaouXJONZZ5Ecw2Sk")
+		if err != nil {
+			log.Fatalln(err)
+		}
 
+		// Send the message and receive the response without retries.
+		response, err := client.Send(msg)
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		log.Printf("%#v\n", response)
+
+	}
 }
