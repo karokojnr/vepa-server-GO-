@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 	"vepa/model"
 	"vepa/util/db"
 
@@ -109,6 +110,8 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id":    result.ID,
 		"email": result.Email,
+		"exp":   time.Now().Add(time.Hour * time.Duration(1)).Unix(),
+		"iat":   time.Now().Unix(),
 	})
 
 	tokenString, err := token.SignedString([]byte("secret"))
