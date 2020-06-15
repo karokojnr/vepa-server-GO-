@@ -118,7 +118,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	// exp := time.Now().Add(time.Hour * time.Duration(1)).Unix()
 	exp := time.Now().Add(time.Hour * 15).Unix()
-	fmt.Println(exp)
+	fmt.Println(time.Now())
 	if err != nil {
 		res.Error = "Error while generating token,Try again"
 		json.NewEncoder(w).Encode(res)
