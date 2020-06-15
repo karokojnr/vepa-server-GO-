@@ -12,6 +12,7 @@ type User struct {
 	PhoneNumber string             `bson:"phoneNumber" json:"phoneNumber"`
 	Password    string             `bson:"password" json:"password"`
 	Token       string             `bson:"token" json:"token"`
+	Exp       int64             `bson:"exp" json:"exp"`
 	FCMToken    string             `bson:"fcmtoken" json:"fcmtoken"`
 }
 

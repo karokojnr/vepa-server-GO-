@@ -115,6 +115,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	})
 
 	tokenString, err := token.SignedString([]byte("secret"))
+	exp := time.Now().Add(time.Hour * time.Duration(1)).Unix()
 
 	if err != nil {
 		res.Error = "Error while generating token,Try again"
@@ -124,6 +125,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	result.Token = tokenString
 	result.Password = ""
+	result.Exp = exp
 
 	json.NewEncoder(w).Encode(result)
 
