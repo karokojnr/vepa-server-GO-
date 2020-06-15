@@ -110,7 +110,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id":    result.ID,
 		"email": result.Email,
-		"exp":   time.Now().Add(time.Hour * time.Duration(1)).Unix(),
+		"exp":   60 * 60,
 		"iat":   time.Now().Unix(),
 	})
 
@@ -119,7 +119,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	// exp := time.Now().UTC().Add(ttl).Unix()
 
 	// exp := time.Now().Add(time.Hour * time.Duration(1)).Unix()
-	exp := time.Now().Add(15 * time.Minute).Unix()
+	exp := 60 * 60
 	fmt.Println(exp)
 	if err != nil {
 		res.Error = "Error while generating token,Try again"
