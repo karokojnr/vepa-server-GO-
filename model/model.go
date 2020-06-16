@@ -4,16 +4,16 @@ import "go.mongodb.org/mongo-driver/bson/primitive"
 
 // User is...
 type User struct {
-	ID          primitive.ObjectID `bson:"_id" json:"_id,omitempty"`
-	Firstname   string             `json:"firstName"`
-	Lastname    string             `json:"lastName"`
-	Email       string             `json:"email"`
-	IDNumber    string             `json:"idNumber"`
-	PhoneNumber string             `json:"phoneNumber"`
-	Password    string             `json:"password"`
-	Token       string             `json:"token"`
-	Exp         int                `json:"exp"`
-	FCMToken    string             `json:"fcmtoken"`
+	ID          primitive.ObjectID `bson:"_id" json:"id,omitempty"`
+	Firstname   string             `bson:"firstName" json:"firstName"`
+	Lastname    string             `bson:"lastName" json:"lastName"`
+	Email       string             `bson:"email" json:"email"`
+	IDNumber    string             `bson:"idNumber" json:"idNumber"`
+	PhoneNumber string             `bson:"phoneNumber" json:"phoneNumber"`
+	Password    string             `bson:"password" json:"password"`
+	Token       string             `bson:"token" json:"token"`
+	Exp         int                `bson:"exp" json:"exp"`
+	FCMToken    string             `bson:"fcmtoken" json:"fcmtoken"`
 }
 
 // Vehicle is...
