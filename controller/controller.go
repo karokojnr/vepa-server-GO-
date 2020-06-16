@@ -191,11 +191,14 @@ func FCMTokenHandler(w http.ResponseWriter, r *http.Request) {
 		update := bson.M{"$set": bson.M{"fcmtoken": "dlP5chPfswo:APA91bGz6fLAeYKJwMOdIBQhmOsqv_xN1Uw-jsPngjqsw4LP3TqojX188arD--ko5-Lq-LowlsjkoJh1OF4wSseZGBy0EU4B2eCe44jGCSg4bm868UTCnHHu6nM81P0Tm6SkBIcks6qM"}}
 		_,err := collection.UpdateOne(context.TODO(), filter, update)
 		if err != nil {
-			fmt.Printf("FCMToken updated")
+			// fmt.Printf("FCMToken updated")
+			fmt.Printf("error...")
+
 		}
-		res.Result = "Something went wrong"
-		json.NewEncoder(w).Encode(res)
-		return
+		// res.Result = "Something went wrong"
+		// json.NewEncoder(w).Encode(res)
+		// return
+		fmt.Printf("FCMToken updated")
 	}
 }
 
