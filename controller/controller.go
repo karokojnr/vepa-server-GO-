@@ -180,15 +180,15 @@ func FCMTokenHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(res)
 		return
 	}
-	var resultUser model.User
+	// var resultUser model.User
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		userID := claims["id"].(string)
 		filter := bson.M{"_id": userID}
-		update := bson.M{
-			"$set": bson.M{"fcmtoken": user.FCMToken},
-		}
-		result := collection.FindOneAndUpdate(context.TODO(), filter, update).Decode(&resultUser)
-		if result != nil {
+		// update := bson.M{
+		// 	"fcmtoken": user.FCMToken},
+		
+		_, err := collection.InsertOne(context.TODO(), filter)
+		if err != nil {
 			fmt.Printf("FCMToken updated")
 		}
 		res.Result = "Something went wrong"
