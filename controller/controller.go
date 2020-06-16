@@ -184,10 +184,10 @@ func FCMTokenHandler(w http.ResponseWriter, r *http.Request) {
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		userID := claims["id"].(string)
 		filter := bson.M{"_id": userID}
-		// update := bson.M{
-		// 	"fcmtoken": user.FCMToken},
-		
-		_, err := collection.InsertOne(context.TODO(), filter)
+		update := bson.M{
+			"$set": bson.M{"fcmtoken": user.FCMToken},
+		}
+		_, err := collection.UpdateOne(context.TODO(), filter, update)
 		if err != nil {
 			fmt.Printf("FCMToken updated")
 		}
