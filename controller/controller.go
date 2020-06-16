@@ -15,6 +15,7 @@ import (
 	"github.com/appleboy/go-fcm"
 	jwt "github.com/dgrijalva/jwt-go"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -51,6 +52,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			user.Password = string(hash)
+			user.ID = primitive.NewObjectID()
 
 			_, err = collection.InsertOne(context.TODO(), user)
 			if err != nil {
