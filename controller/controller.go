@@ -192,23 +192,18 @@ func FCMTokenHandler(w http.ResponseWriter, r *http.Request) {
 		// }
 		// Declare a filter that will change a field's integer value to `42`
 		// update := bson.M{"$set": bson.M{"fcmtoken": "dlP5chPfswo:APA91bGz6fLAeYKJwMOdIBQhmOsqv_xN1Uw-jsPngjqsw4LP3TqojX188arD--ko5-Lq-LowlsjkoJh1OF4wSseZGBy0EU4B2eCe44jGCSg4bm868UTCnHHu6nM81P0Tm6SkBIcks6qM"}}
-		update := bson.D{
-			{"$set", bson.D{
-				{"firstName", user.Firstname},
-				{"lastName", user.Lastname},
-				{"email", user.Email},
-				{"idNumber", user.IDNumber},
-				{"phoneNumber", user.PhoneNumber},
-				{"password", user.Password},
-				{"token", user.Token},
-				{"exp", user.Exp},
-				{"fcmtoken", user.FCMToken},
-				// {"title", book.Title},
-				// {"author", bson.D{
-				// 	{"firstname", book.Author.FirstName},
-				// 	{"lastname", book.Author.LastName},
-				// }},
-			}},
+		update := bson.M{
+			"$set": bson.M {
+				"fcm": user.Firstname,
+				"lastName": user.Lastname,
+				"email": user.Email,
+				"idNumber": user.IDNumber,
+				"phoneNumber": user.PhoneNumber,
+				"password": user.Password,
+				"token": user.Token,
+				"exp": user.Exp,
+				"fcmtoken": user.FCMToken,
+			},
 		}
 		// _, err := collection.UpdateOne(context.TODO(), filter, update)
 		err := collection.FindOneAndUpdate(context.TODO(), filter, update).Decode(&user)
