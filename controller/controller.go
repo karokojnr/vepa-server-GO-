@@ -160,6 +160,7 @@ func ProfileHandler(w http.ResponseWriter, r *http.Request) {
 
 // FCMTokenHandler is...
 func FCMTokenHandler(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
 	w.Header().Set("Content-Type", "application/json")
 	tokenString := r.Header.Get("Authorization")
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
