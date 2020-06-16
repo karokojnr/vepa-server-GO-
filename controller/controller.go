@@ -187,7 +187,9 @@ func FCMTokenHandler(w http.ResponseWriter, r *http.Request) {
 		// update := bson.M{
 		// 	"$set": bson.M{"fcmtoken": user.FCMToken},
 		// }
-		_, err := collection.UpdateOne(context.TODO(), filter, user)
+		// Declare a filter that will change a field's integer value to `42`
+		update := bson.M{"$set": bson.M{"fcmtoken": "dlP5chPfswo:APA91bGz6fLAeYKJwMOdIBQhmOsqv_xN1Uw-jsPngjqsw4LP3TqojX188arD--ko5-Lq-LowlsjkoJh1OF4wSseZGBy0EU4B2eCe44jGCSg4bm868UTCnHHu6nM81P0Tm6SkBIcks6qM"}}
+		_, err := collection.UpdateOne(context.TODO(), filter, update)
 		if err != nil {
 			fmt.Printf("FCMToken updated")
 		}
