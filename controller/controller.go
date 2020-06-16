@@ -54,6 +54,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 			_, err = collection.InsertOne(context.TODO(), user)
 			if err != nil {
+				fmt.Println(err)
 				res.Error = "Error While Creating User, Try Again"
 				json.NewEncoder(w).Encode(res)
 				return
