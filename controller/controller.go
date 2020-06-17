@@ -192,6 +192,7 @@ func FCMTokenHandler(w http.ResponseWriter, r *http.Request) {
 		// 	"$set": bson.M{"fcmtoken": user.FCMToken},
 		// }
 		// Declare a filter that will change a field's integer value to `42`
+		fmt.Println(user.FCMToken)
 		update := bson.M{"$set": bson.M{"fcmtoken": user.FCMToken}}
 		// update := bson.D{
 		// 	{"$set", bson.D {
