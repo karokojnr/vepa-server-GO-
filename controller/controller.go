@@ -432,7 +432,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	fmt.Print(user.FCMToken)
+	fmt.Println(user.FCMToken)
 	msg := &fcm.Message{
 		To: user.FCMToken,
 		Data: map[string]interface{}{
