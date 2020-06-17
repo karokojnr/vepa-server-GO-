@@ -339,14 +339,15 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 	// var result model.Payment
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		userID := claims["id"].(string)
-		fmt.Println(userID)
+		// fmt.Println(userID)
+		log.Println(userID)
 		_, err = collection.InsertOne(context.TODO(), payment)
 				if err != nil {
-					res.Error = "Error While Adding Vehicle, Try Again"
+					res.Error = "Error While Making Payment, Try Again"
 					json.NewEncoder(w).Encode(res)
 					return
 				}
-				res.Result = "Vehicle Added Successfully"
+				res.Result = "Payment Added Successfully"
 				json.NewEncoder(w).Encode(res)
 				// return
 
@@ -374,7 +375,7 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 		})
 
 		if err != nil {
-			log.Println("This is it........")
+			log.Println("err")
 		}
 		log.Println(res)
 		return
@@ -388,23 +389,23 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 // CallBackHandler is...
 func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-TYpe", "application/json")
-	tokenString := r.Header.Get("Authorization")
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		// Don't forget to validate the alg is what you expect:
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method")
-		}
-		return []byte("secret"), nil
-	})
+	// tokenString := r.Header.Get("Authorization")
+	// token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+	// 	// Don't forget to validate the alg is what you expect:
+	// 	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+	// 		return nil, fmt.Errorf("Unexpected signing method")
+	// 	}
+	// 	return []byte("secret"), nil
+	// })
 	var res model.ResponseResult
-	if err != nil {
-		res.Error = "Error, Try Again Later"
-		json.NewEncoder(w).Encode(res)
-		return
-	}
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		userID := claims["id"].(string)
-		fmt.Println(userID)
+	// if err != nil {
+	// 	res.Error = "Error, Try Again Later"
+	// 	json.NewEncoder(w).Encode(res)
+	// 	return
+	// }
+	// if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+	// 	userID := claims["id"].(string)
+	// 	fmt.Println(userID)
 		fmt.Println("-----------Received M-Pesa webhook-----------")
 		// fmt.Println(req.body)
 		// fmt.Println(JSON.stringify(req.body.Body.stkCallback.ResultDesc))
@@ -443,5 +444,5 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 
 		log.Printf("%#v\n", response)
 
-	}
+	// }
 }
