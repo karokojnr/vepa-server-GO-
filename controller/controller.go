@@ -417,18 +417,19 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.Form.Get("id") // x will be "" if parameter is not set
 	fmt.Println("User ID:")
 	fmt.Println(id)
-	_ = collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&result)
-	// if err != nil {
-	// 	if err.Error() == "mongo: no documents in result" {
-	// 		// res.Result = "Something went wrong, Please try again later!"
-	// 		// json.NewEncoder(w).Encode(res)
-	// 		// // return
-	// 		fmt.Println("Something....")
-	// 		// return
-	// 	}
-	// 	// fmt.Println("Something....")
-	// 	// return
-	// }
+	err = collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&result)
+	if err != nil {
+		if err.Error() == "mongo: no documents in result" {
+			// res.Result = "Something went wrong, Please try again later!"
+			// json.NewEncoder(w).Encode(res)
+			// // return
+			fmt.Println("Something....")
+
+			return
+		}
+		// fmt.Println("Something....")
+		// return
+	}
 	fmt.Println("User ID:")
 	fmt.Println(user.ID)
 	fmt.Println("FCMToken:")
