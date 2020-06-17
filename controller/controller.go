@@ -14,6 +14,7 @@ import (
 	"github.com/AndroidStudyOpenSource/mpesa-api-go"
 	"github.com/appleboy/go-fcm"
 	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
@@ -369,7 +370,7 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 			PartyA:            "254799338805",
 			PartyB:            "174379",
 			PhoneNumber:       "254799338805",
-			CallBackURL:       "https://vepa-server-go.herokuapp.com/rcb",
+			CallBackURL:       "https://vepa-server-go.herokuapp.com/rcb/?userId=" + userID,
 			AccountReference:  "Vepa",
 			TransactionDesc:   "Vepa Payment",
 		})
@@ -416,8 +417,14 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("User ID:");
-	fmt.Println(user.ID);
+	// we get params with mux.
+	var params = mux.Vars(r)
+
+	// string to primitive.ObjectID
+	id, _ := primitive.ObjectIDFromHex(params["id"])
+
+	fmt.Println("User ID:")
+	fmt.Println(id)
 
 	err = collection.FindOne(context.TODO(), bson.M{"_id": user.ID}).Decode(&user)
 	if err != nil {
