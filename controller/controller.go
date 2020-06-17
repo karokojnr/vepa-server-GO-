@@ -12,8 +12,8 @@ import (
 	"vepa/util/db"
 
 	"github.com/AndroidStudyOpenSource/mpesa-api-go"
-	// "github.com/appleboy/go-fcm"
-	"github.com/NaySoftware/go-fcm"
+	"github.com/appleboy/go-fcm"
+	// "github.com/NaySoftware/go-fcm"
 	jwt "github.com/dgrijalva/jwt-go"
 	// "github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
@@ -433,56 +433,56 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	fmt.Print(user.FCMToken)
-	// msg := &fcm.Message{
-	// 	To: user.FCMToken,
-	// 	Data: map[string]interface{}{
-	// 		"foo": "bar",
-	// 	},
-	// }
-	// // Create a FCM client to send the message.
-	// client, err := fcm.NewClient("AAAACkklGVY:APA91bEGEFuh7dji5CJKRFz2ih4T8s2We4n3m1mvcnaW3_JoBs9hvkVxMm4ObsG3_MayGAuTnXh9ZoiwYJIN4tepf6xARJxFhOJimzwdEbSfLvhuGZO9FFpaYC5PS5b8SvdAeqscPiXQ")
-	// if err != nil {
-	// 	log.Fatalln(err)
-	// }
-
-	// // Send the message and receive the response without retries.
-	// response, err := client.Send(msg)
-	// if err != nil {
-	// 	log.Fatalln(err)
-	// }
-
-	// log.Printf("%#v\n", response)
-	const (
-		serverKey = "AAAACkklGVY:APA91bEGEFuh7dji5CJKRFz2ih4T8s2We4n3m1mvcnaW3_JoBs9hvkVxMm4ObsG3_MayGAuTnXh9ZoiwYJIN4tepf6xARJxFhOJimzwdEbSfLvhuGZO9FFpaYC5PS5b8SvdAeqscPiXQ"
-	)
-	data := map[string]string{
-		"msg": "Hello World1",
-		"sum": "Happy Day",
+	msg := &fcm.Message{
+		To: user.FCMToken,
+		Data: map[string]interface{}{
+			"foo": "bar",
+		},
+	}
+	// Create a FCM client to send the message.
+	client, err := fcm.NewClient("AAAACkklGVY:APA91bEGEFuh7dji5CJKRFz2ih4T8s2We4n3m1mvcnaW3_JoBs9hvkVxMm4ObsG3_MayGAuTnXh9ZoiwYJIN4tepf6xARJxFhOJimzwdEbSfLvhuGZO9FFpaYC5PS5b8SvdAeqscPiXQ")
+	if err != nil {
+		log.Fatalln(err)
 	}
 
-  ids := []string{
-      user.FCMToken,
-  }
+	// Send the message and receive the response without retries.
+	response, err := client.Send(msg)
+	if err != nil {
+		log.Fatalln(err)
+	}
 
+	log.Printf("%#v\n", response)
+// 	const (
+// 		serverKey = "AAAACkklGVY:APA91bEGEFuh7dji5CJKRFz2ih4T8s2We4n3m1mvcnaW3_JoBs9hvkVxMm4ObsG3_MayGAuTnXh9ZoiwYJIN4tepf6xARJxFhOJimzwdEbSfLvhuGZO9FFpaYC5PS5b8SvdAeqscPiXQ"
+// 	)
+// 	data := map[string]string{
+// 		"msg": "Hello World1",
+// 		"sum": "Happy Day",
+// 	}
 
-//   xds := []string{
-//       "token5",
-//       "token6",
-//       "token7",
+//   ids := []string{
+//       user.FCMToken,
 //   }
 
-	c := fcm.NewFcmClient(serverKey)
-    c.NewFcmRegIdsMsg(ids, data)
-    // c.AppendDevices(xds)
 
-	status, err := c.Send()
+// //   xds := []string{
+// //       "token5",
+// //       "token6",
+// //       "token7",
+// //   }
+
+// 	c := fcm.NewFcmClient(serverKey)
+//     c.NewFcmRegIdsMsg(ids, data)
+//     // c.AppendDevices(xds)
+
+// 	status, err := c.Send()
 
 
-	if err == nil {
-    status.PrintResults()
-	} else {
-		fmt.Println(err)
-	}
+// 	if err == nil {
+//     status.PrintResults()
+// 	} else {
+// 		fmt.Println(err)
+// 	}
 
 
 	return
