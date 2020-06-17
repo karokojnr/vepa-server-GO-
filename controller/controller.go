@@ -390,6 +390,7 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 
 // CallBackHandler is...
 func CallBackHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	// var res model.ResponseResult
 	fmt.Println("-----------Received M-Pesa webhook-----------")
 	fmt.Println(w)
@@ -397,17 +398,26 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("---------------------------------------------")
 	// Create the message to be sent.
 	var user model.User
+	body, _ := ioutil.ReadAll(r.Body)
+	err := json.Unmarshal(body, &user)
+	var res model.ResponseResult
+	if err != nil {
+		res.Error = err.Error()
+		json.NewEncoder(w).Encode(res)
+		return
+	}
 	collection, err := db.GetUserCollection()
 	if err != nil {
 		log.Fatal(err)
 	}
+	var result model.User
 	//extract userId
+
 	r.ParseForm()          // Parses the request body
 	id := r.Form.Get("id") // x will be "" if parameter is not set
 	fmt.Println("User ID:")
 	fmt.Println(id)
-	fmt.Println(user.ID)
-	_ = collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&user)
+	_ = collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&result)
 	// if err != nil {
 	// 	if err.Error() == "mongo: no documents in result" {
 	// 		// res.Result = "Something went wrong, Please try again later!"
