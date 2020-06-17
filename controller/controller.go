@@ -419,6 +419,8 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// we get params with mux.
 	var params = mux.Vars(r)
+	fmt.Println("parama:")
+	fmt.Println(params)
 
 	// string to primitive.ObjectID
 	id, _ := primitive.ObjectIDFromHex(params["id"])
