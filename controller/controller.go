@@ -325,15 +325,31 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return []byte("secret"), nil
 	})
+	var payment model.Payment
 	var res model.ResponseResult
+
+	body,_ := ioutil.ReadAll(r.Body)
+	err = json.Unmarshal(body, &payment)
+	collection, err:= db.GetPaymentCollection()
 	if err != nil {
 		res.Error = "Error, Try Again Later"
 		json.NewEncoder(w).Encode(res)
 		return
 	}
+	// var result model.Payment
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		userID := claims["id"].(string)
 		fmt.Println(userID)
+		_, err = collection.InsertOne(context.TODO(), payment)
+				if err != nil {
+					res.Error = "Error While Adding Vehicle, Try Again"
+					json.NewEncoder(w).Encode(res)
+					return
+				}
+				res.Result = "Vehicle Added Successfully"
+				json.NewEncoder(w).Encode(res)
+				// return
+
 		const (
 			appKey    = "WRnVsZ32lzmgQOVAoiANPAB9se2RYrB2"
 			appSecret = "ixv4HzhalH1fL9ry"
@@ -361,6 +377,7 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 			log.Println("This is it........")
 		}
 		log.Println(res)
+		return
 	}
 	res.Error = err.Error()
 	json.NewEncoder(w).Encode(res)

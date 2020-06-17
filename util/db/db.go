@@ -30,3 +30,14 @@ func GetVehicleCollection() (*mongo.Collection, error) {
 	collection := client.Database("vepadb").Collection("vehicles")
 	return collection, nil
 }
+
+func GetPaymentCollection() (*mongo.Collection, error){
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb+srv://karokojnr:karokojnr@cluster0-ubthk.gcp.mongodb.net"))
+	if err != nil {
+		return nil, err
+	}
+	collection := client.Database("vepadb").Collection("payments")
+	return collection, nil
+}
