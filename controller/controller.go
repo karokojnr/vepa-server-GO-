@@ -431,7 +431,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(res)
 			return
 		}
-	}
+		fmt.Println("FCMToke:")
 	fmt.Println(user.FCMToken)
 	msg := &fcm.Message{
 		To: user.FCMToken,
@@ -452,6 +452,8 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Printf("%#v\n", response)
+	}
+	
 // 	const (
 // 		serverKey = "AAAACkklGVY:APA91bEGEFuh7dji5CJKRFz2ih4T8s2We4n3m1mvcnaW3_JoBs9hvkVxMm4ObsG3_MayGAuTnXh9ZoiwYJIN4tepf6xARJxFhOJimzwdEbSfLvhuGZO9FFpaYC5PS5b8SvdAeqscPiXQ"
 // 	)
