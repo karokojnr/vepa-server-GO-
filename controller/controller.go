@@ -370,7 +370,7 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 			PartyA:            "254799338805",
 			PartyB:            "174379",
 			PhoneNumber:       "254799338805",
-			CallBackURL:       "https://vepa-server-go.herokuapp.com/rcb/?id=" + userID,
+			CallBackURL:       "https://vepa-server-go.herokuapp.com/rcb?id=" + userID,
 			AccountReference:  "Vepa",
 			TransactionDesc:   "Vepa Payment",
 		})
