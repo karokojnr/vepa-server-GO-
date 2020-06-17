@@ -452,6 +452,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Printf("%#v\n", response)
+	return
 	}
 	
 // 	const (
