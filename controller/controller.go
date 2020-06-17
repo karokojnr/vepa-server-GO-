@@ -419,6 +419,8 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	// 	// fmt.Println("Something....")
 	// 	// return
 	// }
+	fmt.Println("User ID:")
+	fmt.Println(user.ID)
 	fmt.Println("FCMToken:")
 	fmt.Println(user.FCMToken)
 	msg := &fcm.Message{
