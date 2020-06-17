@@ -389,7 +389,7 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 
 // CallBackHandler is...
 func CallBackHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-TYpe", "application/json")
+	// w.Header().Set("Content-TYpe", "application/json")
 	// tokenString := r.Header.Get("Authorization")
 	// token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 	// 	// Don't forget to validate the alg is what you expect:
