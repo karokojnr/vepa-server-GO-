@@ -407,18 +407,18 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("User ID:")
 	fmt.Println(id)
 	var result model.User
-	err = collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&result)
-	if err != nil {
-		if err.Error() == "mongo: no documents in result" {
-			// res.Result = "Something went wrong, Please try again later!"
-			// json.NewEncoder(w).Encode(res)
-			// // return
-			fmt.Println("Something....")
-			// return
-		}
-		// fmt.Println("Something....")
-		return
-	}
+	_ = collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&result)
+	// if err != nil {
+	// 	if err.Error() == "mongo: no documents in result" {
+	// 		// res.Result = "Something went wrong, Please try again later!"
+	// 		// json.NewEncoder(w).Encode(res)
+	// 		// // return
+	// 		fmt.Println("Something....")
+	// 		// return
+	// 	}
+	// 	// fmt.Println("Something....")
+	// 	// return
+	// }
 	fmt.Println("FCMToken:")
 	fmt.Println(result.FCMToken)
 	msg := &fcm.Message{
