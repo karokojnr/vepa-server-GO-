@@ -414,6 +414,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 		// 	return
 		// }
 		fmt.Println("Something went wrong, Please try again later!")
+		return
 	}
 	fmt.Println("FCMToken:")
 	fmt.Println(user.FCMToken)
