@@ -431,7 +431,8 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(res)
 			return
 		}
-		fmt.Println("FCMToke:")
+	}
+	fmt.Println("FCMToken:")
 	fmt.Println(user.FCMToken)
 	msg := &fcm.Message{
 		To: user.FCMToken,
@@ -453,40 +454,36 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("%#v\n", response)
 	return
-	}
-	
-// 	const (
-// 		serverKey = "AAAACkklGVY:APA91bEGEFuh7dji5CJKRFz2ih4T8s2We4n3m1mvcnaW3_JoBs9hvkVxMm4ObsG3_MayGAuTnXh9ZoiwYJIN4tepf6xARJxFhOJimzwdEbSfLvhuGZO9FFpaYC5PS5b8SvdAeqscPiXQ"
-// 	)
-// 	data := map[string]string{
-// 		"msg": "Hello World1",
-// 		"sum": "Happy Day",
-// 	}
 
-//   ids := []string{
-//       user.FCMToken,
-//   }
+	// 	const (
+	// 		serverKey = "AAAACkklGVY:APA91bEGEFuh7dji5CJKRFz2ih4T8s2We4n3m1mvcnaW3_JoBs9hvkVxMm4ObsG3_MayGAuTnXh9ZoiwYJIN4tepf6xARJxFhOJimzwdEbSfLvhuGZO9FFpaYC5PS5b8SvdAeqscPiXQ"
+	// 	)
+	// 	data := map[string]string{
+	// 		"msg": "Hello World1",
+	// 		"sum": "Happy Day",
+	// 	}
 
+	//   ids := []string{
+	//       user.FCMToken,
+	//   }
 
-// //   xds := []string{
-// //       "token5",
-// //       "token6",
-// //       "token7",
-// //   }
+	// //   xds := []string{
+	// //       "token5",
+	// //       "token6",
+	// //       "token7",
+	// //   }
 
-// 	c := fcm.NewFcmClient(serverKey)
-//     c.NewFcmRegIdsMsg(ids, data)
-//     // c.AppendDevices(xds)
+	// 	c := fcm.NewFcmClient(serverKey)
+	//     c.NewFcmRegIdsMsg(ids, data)
+	//     // c.AppendDevices(xds)
 
-// 	status, err := c.Send()
+	// 	status, err := c.Send()
 
-
-// 	if err == nil {
-//     status.PrintResults()
-// 	} else {
-// 		fmt.Println(err)
-// 	}
-
+	// 	if err == nil {
+	//     status.PrintResults()
+	// 	} else {
+	// 		fmt.Println(err)
+	// 	}
 
 	return
 
