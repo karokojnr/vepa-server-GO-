@@ -417,9 +417,9 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// we get params with mux.
-	var params = mux.Vars(r)
-	fmt.Println("parama:")
+	//get params with mux.
+	var params = mux.Vars(r)["id"]
+	fmt.Println("params:")
 	fmt.Println(params)
 
 	// string to primitive.ObjectID
@@ -428,7 +428,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("User ID:")
 	fmt.Println(id)
 
-	err = collection.FindOne(context.TODO(), bson.M{"_id": user.ID}).Decode(&user)
+	err = collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&user)
 	if err != nil {
 		if err.Error() == "mongo: no documents in result" {
 			res.Result = "Something went wrong, Please try again later!"
