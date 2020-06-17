@@ -408,7 +408,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	// 	userID := claims["id"].(string)
 	// 	fmt.Println(userID)
 	fmt.Println("-----------Received M-Pesa webhook-----------")
-	// fmt.Println(req.body)
+	fmt.Println(w)
 	// fmt.Println(JSON.stringify(req.body.Body.stkCallback.ResultDesc))
 	fmt.Println("---------------------------------------------")
 	// Create the message to be sent.
@@ -452,6 +452,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Printf("%#v\n", response)
+	return
 
 	// }
 }
