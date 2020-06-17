@@ -410,14 +410,14 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	var result model.User
+	// var result model.User
 	//extract userId
 
 	r.ParseForm()          // Parses the request body
 	id := r.Form.Get("id") // x will be "" if parameter is not set
 	fmt.Println("User ID:")
 	fmt.Println(id)
-	_ = collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&result)
+	_ = collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&user)
 	// if err != nil {
 	// 	if err.Error() == "mongo: no documents in result" {
 	// 		// res.Result = "Something went wrong, Please try again later!"
