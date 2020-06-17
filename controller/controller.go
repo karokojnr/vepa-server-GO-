@@ -328,9 +328,9 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 	var payment model.Payment
 	var res model.ResponseResult
 
-	body,_ := ioutil.ReadAll(r.Body)
+	body, _ := ioutil.ReadAll(r.Body)
 	err = json.Unmarshal(body, &payment)
-	collection, err:= db.GetPaymentCollection()
+	collection, err := db.GetPaymentCollection()
 	if err != nil {
 		res.Error = "Error, Try Again Later"
 		json.NewEncoder(w).Encode(res)
@@ -342,14 +342,14 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 		// fmt.Println(userID)
 		log.Println(userID)
 		_, err = collection.InsertOne(context.TODO(), payment)
-				if err != nil {
-					res.Error = "Error While Making Payment, Try Again"
-					json.NewEncoder(w).Encode(res)
-					return
-				}
-				res.Result = "Payment Added Successfully"
-				json.NewEncoder(w).Encode(res)
-				// return
+		if err != nil {
+			res.Error = "Error While Making Payment, Try Again"
+			json.NewEncoder(w).Encode(res)
+			return
+		}
+		res.Result = "Payment Added Successfully"
+		json.NewEncoder(w).Encode(res)
+		// return
 
 		const (
 			appKey    = "WRnVsZ32lzmgQOVAoiANPAB9se2RYrB2"
@@ -406,43 +406,46 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	// if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 	// 	userID := claims["id"].(string)
 	// 	fmt.Println(userID)
-		fmt.Println("-----------Received M-Pesa webhook-----------")
-		// fmt.Println(req.body)
-		// fmt.Println(JSON.stringify(req.body.Body.stkCallback.ResultDesc))
-		fmt.Println("---------------------------------------------")
-		// Create the message to be sent.
-		var user model.User
-		collection, err := db.GetUserCollection()
-		if err != nil {
-			log.Fatal(err)
-		}
-		err = collection.FindOne(context.TODO(), bson.M{"_id": user.ID}).Decode(&user)
-		if err != nil {
-			if err.Error() == "mongo: no documents in result" {
-				res.Result = "Something went wrong, Please try again later!"
-				json.NewEncoder(w).Encode(res)
-				return
-			}
-		}
-		msg := &fcm.Message{
-			To: user.FCMToken,
-			Data: map[string]interface{}{
-				"foo": "bar",
-			},
-		}
-		// Create a FCM client to send the message.
-		client, err := fcm.NewClient("AIzaSyABBYrj6YeQxxqbgIsaouXJONZZ5Ecw2Sk")
-		if err != nil {
-			log.Fatalln(err)
-		}
+	fmt.Println("-----------Received M-Pesa webhook-----------")
+	// fmt.Println(req.body)
+	// fmt.Println(JSON.stringify(req.body.Body.stkCallback.ResultDesc))
+	fmt.Println("---------------------------------------------")
+	// Create the message to be sent.
+	var user model.User
+	collection, err := db.GetUserCollection()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("User ID:");
+	fmt.Println(user.ID);
 
-		// Send the message and receive the response without retries.
-		response, err := client.Send(msg)
-		if err != nil {
-			log.Fatalln(err)
+	err = collection.FindOne(context.TODO(), bson.M{"_id": user.ID}).Decode(&user)
+	if err != nil {
+		if err.Error() == "mongo: no documents in result" {
+			res.Result = "Something went wrong, Please try again later!"
+			json.NewEncoder(w).Encode(res)
+			return
 		}
+	}
+	msg := &fcm.Message{
+		To: user.FCMToken,
+		Data: map[string]interface{}{
+			"foo": "bar",
+		},
+	}
+	// Create a FCM client to send the message.
+	client, err := fcm.NewClient("AIzaSyABBYrj6YeQxxqbgIsaouXJONZZ5Ecw2Sk")
+	if err != nil {
+		log.Fatalln(err)
+	}
 
-		log.Printf("%#v\n", response)
+	// Send the message and receive the response without retries.
+	response, err := client.Send(msg)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	log.Printf("%#v\n", response)
 
 	// }
 }
