@@ -413,11 +413,11 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 			// json.NewEncoder(w).Encode(res)
 			// // return
 			fmt.Println("Something....")
-			return
+			// return
 		}
 		// fmt.Println("Something....")
 		// return
-	}
+	
 	fmt.Println("FCMToken:")
 	fmt.Println(user.FCMToken)
 	msg := &fcm.Message{
@@ -438,4 +438,5 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Printf("%#v\n", response)
 	return
+}
 }
