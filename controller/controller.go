@@ -410,7 +410,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	var result model.User
+
 	//extract userId
 
 	r.ParseForm()          // Parses the request body
@@ -420,18 +420,22 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	filter := bson.M{"_id": id}
 	fmt.Println(filter)
 	//TODO: ERROR
-	err = collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&result)
-	if err != nil {
-		if err.Error() == "mongo: no documents in result" {
-			// res.Result = "Something went wrong, Please try again later!"
-			// json.NewEncoder(w).Encode(res)
-			// // return
-			fmt.Println("Something....")
-			return
-		}
-		// fmt.Println("Something....")
-		// return
-	}
+	doc := collection.FindOne(context.TODO(), filter)
+	// if err != nil {
+	// 	if err.Error() == "mongo: no documents in result" {
+	// 		// res.Result = "Something went wrong, Please try again later!"
+	// 		// json.NewEncoder(w).Encode(res)
+	// 		// // return
+	// 		fmt.Println("Something....")
+	// 		return
+	// 	}
+	// 	// fmt.Println("Something....")
+	// 	// return
+	// }
+	// decode user model.
+	var result model.User
+	doc.Decode(&result)
+
 	fmt.Println("User ID:")
 	fmt.Println(user.ID)
 	fmt.Println("FCMToken:")
