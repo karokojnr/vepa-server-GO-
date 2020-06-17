@@ -417,9 +417,12 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	r.ParseForm()                     // Parses the request body
+    x := r.Form.Get("id") // x will be "" if parameter is not set
+    fmt.Println(x)
 	//get params with mux.
 	fmt.Println(r)
-	var params = mux.Vars(r)
+	params := mux.Vars(r)
 	fmt.Println("params:")
 	fmt.Println(params)
 
