@@ -390,7 +390,7 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 
 // CallBackHandler is...
 func CallBackHandler(w http.ResponseWriter, r *http.Request) {
-	// var res model.ResponseResult
+	var res model.ResponseResult
 	fmt.Println("-----------Received M-Pesa webhook-----------")
 	fmt.Println(w)
 	// fmt.Println(JSON.stringify(req.body.Body.stkCallback.ResultDesc))
@@ -408,13 +408,13 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(id)
 	err = collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&user)
 	if err != nil {
-		// if err.Error() == "mongo: no documents in result" {
-		// 	res.Result = "Something went wrong, Please try again later!"
-		// 	json.NewEncoder(w).Encode(res)
-		// 	return
-		// }
-		fmt.Println("Something went wrong, Please try again later!")
-		return
+		if err.Error() == "mongo: no documents in result" {
+			res.Result = "Something went wrong, Please try again later!"
+			json.NewEncoder(w).Encode(res)
+			return
+		}
+		fmt.Println("Something....")
+		// return
 	}
 	fmt.Println("FCMToken:")
 	fmt.Println(user.FCMToken)
