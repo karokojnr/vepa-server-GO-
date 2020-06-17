@@ -410,14 +410,14 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// var result model.User
+	var result model.User
 	//extract userId
 
 	r.ParseForm()          // Parses the request body
 	id := r.Form.Get("id") // x will be "" if parameter is not set
 	fmt.Println("User ID:")
 	fmt.Println(id)
-	_ = collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&user)
+	_ = collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&result)
 	// if err != nil {
 	// 	if err.Error() == "mongo: no documents in result" {
 	// 		// res.Result = "Something went wrong, Please try again later!"
@@ -432,7 +432,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("User ID:")
 	fmt.Println(user.ID)
 	fmt.Println("FCMToken:")
-	fmt.Println(user.FCMToken)
+	fmt.Println(result.FCMToken)
 	msg := &fcm.Message{
 		To: user.FCMToken,
 		Data: map[string]interface{}{
