@@ -30,7 +30,7 @@ func GetVehicleCollection() (*mongo.Collection, error) {
 	collection := client.Database("vepadb").Collection("vehicles")
 	return collection, nil
 }
-
+// GetPaymentCollection is...
 func GetPaymentCollection() (*mongo.Collection, error){
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()

@@ -418,11 +418,10 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 	//extract userId
-	r.ParseForm()                     // Parses the request body
+	r.ParseForm()          // Parses the request body
 	id := r.Form.Get("id") // x will be "" if parameter is not set
 	fmt.Println("User ID:")
-    fmt.Println(id)
-	
+	fmt.Println(id)
 
 	err = collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&user)
 	if err != nil {
@@ -440,7 +439,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 	// Create a FCM client to send the message.
-	client, err := fcm.NewClient(user.FCMToken)
+	client, err := fcm.NewClient("AIzaSyABBYrj6YeQxxqbgIsaouXJONZZ5Ecw2Sk")
 	if err != nil {
 		log.Fatalln(err)
 	}
