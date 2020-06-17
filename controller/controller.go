@@ -187,10 +187,6 @@ func FCMTokenHandler(w http.ResponseWriter, r *http.Request) {
 		filter := bson.M{"_id": userID}
 		// Read update model from body request
 		_ = json.NewDecoder(r.Body).Decode(&user)
-
-		// update := bson.M{
-		// 	"$set": bson.M{"fcmtoken": user.FCMToken},
-		// }
 		// Declare a filter that will change a field's integer value to `42`
 		fmt.Println(user.FCMToken)
 		update := bson.M{"$set": bson.M{"fcmtoken": user.FCMToken}}
@@ -216,10 +212,10 @@ func FCMTokenHandler(w http.ResponseWriter, r *http.Request) {
 			return
 
 		}
-		// res.Result = "Something went wrong"
-		// json.NewEncoder(w).Encode(res)
-		// return
-		fmt.Printf("FCMToken updated")
+		res.Result = "FCMToken updated"
+		json.NewEncoder(w).Encode(res)
+		return
+		// fmt.Printf("FCMToken updated")
 	}
 }
 
