@@ -390,30 +390,30 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 
 // CallBackHandler is...
 func CallBackHandler(w http.ResponseWriter, r *http.Request) {
-	// var res model.ResponseResult
+	var res model.ResponseResult
 	fmt.Println("-----------Received M-Pesa webhook-----------")
 	fmt.Println(w)
 	// fmt.Println(JSON.stringify(req.body.Body.stkCallback.ResultDesc))
 	fmt.Println("---------------------------------------------")
 	// Create the message to be sent.
 	var user model.User
-	// collection, err := db.GetUserCollection()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	collection, err := db.GetUserCollection()
+	if err != nil {
+		log.Fatal(err)
+	}
 	//extract userId
 	r.ParseForm()          // Parses the request body
 	id := r.Form.Get("id") // x will be "" if parameter is not set
 	fmt.Println("User ID:")
 	fmt.Println(id)
-	// err = collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&user)
-	// if err != nil {
-	// 	if err.Error() == "mongo: no documents in result" {
-	// 		res.Result = "Something went wrong, Please try again later!"
-	// 		json.NewEncoder(w).Encode(res)
-	// 		return
-	// 	}
-	// }
+	err = collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&user)
+	if err != nil {
+		if err.Error() == "mongo: no documents in result" {
+			res.Result = "Something went wrong, Please try again later!"
+			json.NewEncoder(w).Encode(res)
+			return
+		}
+	}
 	fmt.Println("FCMToken:")
 	fmt.Println(user.FCMToken)
 	msg := &fcm.Message{
