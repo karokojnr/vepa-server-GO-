@@ -413,9 +413,10 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 			// json.NewEncoder(w).Encode(res)
 			// // return
 			fmt.Println("Something....")
+			return
 		}
 		// fmt.Println("Something....")
-		return
+		// return
 	}
 	fmt.Println("FCMToken:")
 	fmt.Println(user.FCMToken)
