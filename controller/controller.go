@@ -418,6 +418,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 	//get params with mux.
+	fmt.Println(r)
 	var params = mux.Vars(r)
 	fmt.Println("params:")
 	fmt.Println(params)
