@@ -409,9 +409,10 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	err = collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&user)
 	if err != nil {
 		if err.Error() == "mongo: no documents in result" {
-			res.Result = "Something went wrong, Please try again later!"
-			json.NewEncoder(w).Encode(res)
-			return
+			// res.Result = "Something went wrong, Please try again later!"
+			// json.NewEncoder(w).Encode(res)
+			// return
+			fmt.Println("Something....")
 		}
 		fmt.Println("Something....")
 		// return
