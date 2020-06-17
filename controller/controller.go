@@ -390,49 +390,30 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 
 // CallBackHandler is...
 func CallBackHandler(w http.ResponseWriter, r *http.Request) {
-	// w.Header().Set("Content-TYpe", "application/json")
-	// tokenString := r.Header.Get("Authorization")
-	// token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-	// 	// Don't forget to validate the alg is what you expect:
-	// 	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-	// 		return nil, fmt.Errorf("Unexpected signing method")
-	// 	}
-	// 	return []byte("secret"), nil
-	// })
-	var res model.ResponseResult
-	// if err != nil {
-	// 	res.Error = "Error, Try Again Later"
-	// 	json.NewEncoder(w).Encode(res)
-	// 	return
-	// }
-	// if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-	// 	userID := claims["id"].(string)
-	// 	fmt.Println(userID)
+	// var res model.ResponseResult
 	fmt.Println("-----------Received M-Pesa webhook-----------")
 	fmt.Println(w)
 	// fmt.Println(JSON.stringify(req.body.Body.stkCallback.ResultDesc))
 	fmt.Println("---------------------------------------------")
 	// Create the message to be sent.
 	var user model.User
-	collection, err := db.GetUserCollection()
-	if err != nil {
-		log.Fatal(err)
-	}
+	// collection, err := db.GetUserCollection()
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 	//extract userId
 	r.ParseForm()          // Parses the request body
 	id := r.Form.Get("id") // x will be "" if parameter is not set
 	fmt.Println("User ID:")
 	fmt.Println(id)
-
-	err = collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&user)
-	fmt.Println("FCMToken:")
-	if err != nil {
-		if err.Error() == "mongo: no documents in result" {
-			res.Result = "Something went wrong, Please try again later!"
-			json.NewEncoder(w).Encode(res)
-			return
-		}
-	}
+	// err = collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&user)
+	// if err != nil {
+	// 	if err.Error() == "mongo: no documents in result" {
+	// 		res.Result = "Something went wrong, Please try again later!"
+	// 		json.NewEncoder(w).Encode(res)
+	// 		return
+	// 	}
+	// }
 	fmt.Println("FCMToken:")
 	fmt.Println(user.FCMToken)
 	msg := &fcm.Message{
@@ -446,47 +427,11 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	// Send the message and receive the response without retries.
 	response, err := client.Send(msg)
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	log.Printf("%#v\n", response)
 	return
-
-	// 	const (
-	// 		serverKey = "AAAACkklGVY:APA91bEGEFuh7dji5CJKRFz2ih4T8s2We4n3m1mvcnaW3_JoBs9hvkVxMm4ObsG3_MayGAuTnXh9ZoiwYJIN4tepf6xARJxFhOJimzwdEbSfLvhuGZO9FFpaYC5PS5b8SvdAeqscPiXQ"
-	// 	)
-	// 	data := map[string]string{
-	// 		"msg": "Hello World1",
-	// 		"sum": "Happy Day",
-	// 	}
-
-	//   ids := []string{
-	//       user.FCMToken,
-	//   }
-
-	// //   xds := []string{
-	// //       "token5",
-	// //       "token6",
-	// //       "token7",
-	// //   }
-
-	// 	c := fcm.NewFcmClient(serverKey)
-	//     c.NewFcmRegIdsMsg(ids, data)
-	//     // c.AppendDevices(xds)
-
-	// 	status, err := c.Send()
-
-	// 	if err == nil {
-	//     status.PrintResults()
-	// 	} else {
-	// 		fmt.Println(err)
-	// 	}
-
-	return
-
-	// }
 }
