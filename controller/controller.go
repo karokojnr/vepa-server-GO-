@@ -439,7 +439,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 	// Create a FCM client to send the message.
-	client, err := fcm.NewClient("AIzaSyABBYrj6YeQxxqbgIsaouXJONZZ5Ecw2Sk")
+	client, err := fcm.NewClient("AAAACkklGVY:APA91bEGEFuh7dji5CJKRFz2ih4T8s2We4n3m1mvcnaW3_JoBs9hvkVxMm4ObsG3_MayGAuTnXh9ZoiwYJIN4tepf6xARJxFhOJimzwdEbSfLvhuGZO9FFpaYC5PS5b8SvdAeqscPiXQ")
 	if err != nil {
 		log.Fatalln(err)
 	}
