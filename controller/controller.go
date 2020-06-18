@@ -390,7 +390,7 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 
 // CallBackHandler is...
 func CallBackHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+	// w.Header().Set("Content-Type", "application/json")
 	// var res model.ResponseResult
 	fmt.Println("-----------Received M-Pesa webhook-----------")
 	fmt.Println(w)
