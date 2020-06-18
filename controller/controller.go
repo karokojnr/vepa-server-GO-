@@ -417,7 +417,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.Form.Get("id") // x will be "" if parameter is not set
 	fmt.Println("User ID:")
 	fmt.Println(id)
-	filter := bson.M{"_id": id}
+	filter := bson.M{"_id": "5eea8ff73e44c15ae9a6818d"}
 	fmt.Println(filter)
 	//TODO: ERROR
 	doc := collection.FindOne(context.TODO(), filter)
