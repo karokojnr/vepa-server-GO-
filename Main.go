@@ -16,7 +16,7 @@ func main() {
 	r.HandleFunc("/login", controller.LoginHandler).Methods("POST")
 	r.HandleFunc("/addVehicle", controller.AddVehicleHandler).Methods("POST")
 	r.HandleFunc("/makePayment", controller.PaymentHandler).Methods("POST")
-	r.HandleFunc("/rcb", controller.CallBackHandler).Methods("POST")
+	r.HandleFunc("/rcb", controller.CallBackHandler).Methods("GET")
 	r.HandleFunc("/token", controller.FCMTokenHandler).Methods("PUT")
 	r.HandleFunc("/profile", controller.ProfileHandler).Methods("GET")
 	r.HandleFunc("/userVehicles", controller.UserVehiclesHandler).Methods("GET")

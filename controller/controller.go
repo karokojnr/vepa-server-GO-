@@ -414,7 +414,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	//extract userId
 
 	r.ParseForm()          // Parses the request body
-	id := r.Form.Get("id") // x will be "" if parameter is not set
+	id := r.Form.Get("id")
 	fmt.Println("User ID:")
 	fmt.Println(id)
 	filter := bson.M{"_id": "5eea8ff73e44c15ae9a6818d"}
