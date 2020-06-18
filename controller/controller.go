@@ -114,7 +114,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id":    result.ID,
 		"email": result.Email,
-		"fcmToken" : result.FCMToken,
+		
 	})
 
 	tokenString, err := token.SignedString([]byte("secret"))
@@ -123,6 +123,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	// exp := time.Now().Add(time.Hour * time.Duration(1)).Unix()
 	exp := 60 * 60
+	fmt.Println("Expires in ... seconds: ")
 	fmt.Println(exp)
 	if err != nil {
 		res.Error = "Error while generating token,Try again"
@@ -343,10 +344,10 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 	// var result model.Payment
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		userID := claims["id"].(string)
-		fcmToken := claims["fcmToken"].(string)
-		// fmt.Println(userID)
+		// fcmToken := claims["fcmToken"].(string)
+		fmt.Println("Payment Handeler Used ID:")
 		log.Println(userID)
-		log.Println(fcmToken)
+		
 
 		// userCollection, err := db.GetUserCollection()
 		// filter := bson.M{"_id": userID}
@@ -399,7 +400,7 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 			PartyA:            "254799338805",
 			PartyB:            "174379",
 			PhoneNumber:       "254799338805",
-			CallBackURL:       "https://vepa-server-go.herokuapp.com/rcb?id=" + fcmToken,
+			CallBackURL:       "https://vepa-server-go.herokuapp.com/rcb?id=" + userID,
 			AccountReference:  "Vepa",
 			TransactionDesc:   "Vepa Payment",
 		})
@@ -444,7 +445,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm() // Parses the request body
 	id := r.Form.Get("id")
 	// fmt.Println("User ID:")
-	fmt.Println("FCM Token:")
+	fmt.Println("Callback Handler User ID:")
 	fmt.Println(id)
 	filter := bson.M{"_id": id}
 	fmt.Println(filter)
