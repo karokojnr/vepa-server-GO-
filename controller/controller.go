@@ -184,7 +184,8 @@ func FCMTokenHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// var resultUser model.User
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		userID := claims["id"].(string)
+		id := claims["id"].(string)
+		userID, _ := primitive.ObjectIDFromHex(id)
 		// fcmToken := claims["fcmToken"].(string)
 		filter := bson.M{"_id": userID}
 		// Read update model from body request
