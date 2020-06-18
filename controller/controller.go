@@ -447,7 +447,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	// fmt.Println("User ID:")
 	fmt.Println("Callback Handler User ID:")
 	fmt.Println(id)
-	filter := bson.M{"_id": id}
+	filter := bson.M{"email": "ken@gmail.com"}
 	fmt.Println(filter)
 	//TODO: ERROR
 	var result model.User
