@@ -450,9 +450,9 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	msg := &fcm.Message{
 		To: result.FCMToken,
 		Data: map[string]interface{}{
-			// "foo": "bar",
-			"title": "Vepa",
-            "body": "Successful",
+			"foo": "bar",
+			// "title": "Vepa",
+            // "body": "Successful",
 		},
 	}
 	// Create a FCM client to send the message.
