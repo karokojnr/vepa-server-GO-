@@ -176,8 +176,8 @@ func FCMTokenHandler(w http.ResponseWriter, r *http.Request) {
 	var user model.User
 	var res model.ResponseResult
 
-	// body, _ := ioutil.ReadAll(r.Body)
-	// err = json.Unmarshal(body, &user)
+	body, _ := ioutil.ReadAll(r.Body)
+	err = json.Unmarshal(body, &user)
 	collection, err := db.GetUserCollection()
 	if err != nil {
 		res.Error = err.Error()
@@ -190,7 +190,7 @@ func FCMTokenHandler(w http.ResponseWriter, r *http.Request) {
 		// fcmToken := claims["fcmToken"].(string)
 		filter := bson.M{"_id": userID}
 		// Read update model from body request
-		_ = json.NewDecoder(r.Body).Decode(&user)
+		// _ = json.NewDecoder(r.Body).Decode(&user)
 		// Declare a filter that will change a field's integer value to `42`
 		fmt.Println("FCMToken Handler fcmtoken: ")
 		fmt.Println(user.FCMToken)
@@ -209,7 +209,8 @@ func FCMTokenHandler(w http.ResponseWriter, r *http.Request) {
 		// 	}},
 		// }
 		// _, err := collection.UpdateOne(context.TODO(), filter, update)
-		err := collection.FindOneAndUpdate(context.TODO(), filter, update).Decode(&user)
+		var result model.User
+		err := collection.FindOneAndUpdate(context.TODO(), filter, update).Decode(&result)
 
 		if err != nil {
 			// fmt.Printf("FCMToken updated")
