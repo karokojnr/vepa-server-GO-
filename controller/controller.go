@@ -114,6 +114,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id":    result.ID,
 		"email": result.Email,
+		"fcmToken" : result.FCMToken,
 	})
 
 	tokenString, err := token.SignedString([]byte("secret"))
@@ -186,6 +187,7 @@ func FCMTokenHandler(w http.ResponseWriter, r *http.Request) {
 	// var resultUser model.User
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		userID := claims["id"].(string)
+		// fcmToken := claims["fcmToken"].(string)
 		filter := bson.M{"_id": userID}
 		// Read update model from body request
 		_ = json.NewDecoder(r.Body).Decode(&user)
@@ -341,30 +343,32 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 	// var result model.Payment
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		userID := claims["id"].(string)
+		fcmToken := claims["fcmToken"].(string)
 		// fmt.Println(userID)
 		log.Println(userID)
-		userCollection, err := db.GetUserCollection()
-		filter := bson.M{"_id": userID}
-		fmt.Println("User ID filter:....")
-		fmt.Println(filter)
-		if err != nil {
-			log.Fatal(err)
-		}
-		var result model.User
-		err = userCollection.FindOne(context.TODO(), filter).Decode(&result)
-		if err != nil {
-			if err.Error() == "mongo: no documents in result" {
-				// res.Result = "Something went wrong, Please try again later!"
-				// json.NewEncoder(w).Encode(res)
-				// // return
-				fmt.Println("Something....")
-				return
-			}
-			// fmt.Println("Something....")
-			// return
-		}
-		fmt.Println("User FCM Token Payment Handler:....")
-		fmt.Println(result.FCMToken)
+
+		// userCollection, err := db.GetUserCollection()
+		// filter := bson.M{"_id": userID}
+		// fmt.Println("User ID filter:....")
+		// fmt.Println(filter)
+		// if err != nil {
+		// 	log.Fatal(err)
+		// }
+		// var result model.User
+		// err = userCollection.FindOne(context.TODO(), filter).Decode(&result)
+		// if err != nil {
+		// 	if err.Error() == "mongo: no documents in result" {
+		// 		// res.Result = "Something went wrong, Please try again later!"
+		// 		// json.NewEncoder(w).Encode(res)
+		// 		// // return
+		// 		fmt.Println("Something....")
+		// 		return
+		// 	}
+		// 	// fmt.Println("Something....")
+		// 	// return
+		// }
+		// fmt.Println("User FCM Token Payment Handler:....")
+		// fmt.Println(result.FCMToken)
 
 		_, err = collection.InsertOne(context.TODO(), payment)
 		if err != nil {
@@ -394,7 +398,7 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 			PartyA:            "254799338805",
 			PartyB:            "174379",
 			PhoneNumber:       "254799338805",
-			CallBackURL:       "https://vepa-server-go.herokuapp.com/rcb?id=" + userID,
+			CallBackURL:       "https://vepa-server-go.herokuapp.com/rcb?id=" + fcmToken,
 			AccountReference:  "Vepa",
 			TransactionDesc:   "Vepa Payment",
 		})
@@ -438,7 +442,8 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseForm() // Parses the request body
 	id := r.Form.Get("id")
-	fmt.Println("User ID:")
+	// fmt.Println("User ID:")
+	fmt.Println("FCM Token:")
 	fmt.Println(id)
 	filter := bson.M{"_id": id}
 	fmt.Println(filter)
@@ -462,7 +467,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("FCMToken:")
 	fmt.Println(result.FCMToken)
 	msg := &fcm.Message{
-		To: user.FCMToken,
+		To: id,
 		Data: map[string]interface{}{
 			"foo": "bar",
 		},
