@@ -192,6 +192,7 @@ func FCMTokenHandler(w http.ResponseWriter, r *http.Request) {
 		// Read update model from body request
 		_ = json.NewDecoder(r.Body).Decode(&user)
 		// Declare a filter that will change a field's integer value to `42`
+		fmt.Println("FCMToken Handler fcmtoken: ")
 		fmt.Println(user.FCMToken)
 		update := bson.M{"$set": bson.M{"fcmtoken": user.FCMToken}}
 		// update := bson.D{
@@ -216,10 +217,10 @@ func FCMTokenHandler(w http.ResponseWriter, r *http.Request) {
 			return
 
 		}
+		fmt.Printf("FCMToken updated")
 		res.Result = "FCMToken updated"
 		json.NewEncoder(w).Encode(res)
 		return
-		// fmt.Printf("FCMToken updated")
 	}
 }
 
@@ -441,10 +442,10 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	//extract userId
 
 	r.ParseForm() // Parses the request body
-	id := r.Form.Get("id")
+	// id := r.Form.Get("id")
 	// fmt.Println("User ID:")
-	fmt.Println("Callback Handler User ID:")
-	fmt.Println(id)
+	// fmt.Println("Callback Handler User ID:")
+	// fmt.Println(id)
 	filter := bson.M{"email": "ken@gmail.com"}
 	fmt.Println(filter)
 	//TODO: ERROR
