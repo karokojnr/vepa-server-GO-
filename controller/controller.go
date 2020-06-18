@@ -420,21 +420,20 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	filter := bson.M{"_id": "5eea8ff73e44c15ae9a6818d"}
 	fmt.Println(filter)
 	//TODO: ERROR
-	doc := collection.FindOne(context.TODO(), filter)
-	// if err != nil {
-	// 	if err.Error() == "mongo: no documents in result" {
-	// 		// res.Result = "Something went wrong, Please try again later!"
-	// 		// json.NewEncoder(w).Encode(res)
-	// 		// // return
-	// 		fmt.Println("Something....")
-	// 		return
-	// 	}
-	// 	// fmt.Println("Something....")
-	// 	// return
-	// }
-	// decode user model.
 	var result model.User
-	doc.Decode(&result)
+	err = collection.FindOne(context.TODO(), filter).Decode(&result)
+	if err != nil {
+		if err.Error() == "mongo: no documents in result" {
+			// res.Result = "Something went wrong, Please try again later!"
+			// json.NewEncoder(w).Encode(res)
+			// // return
+			fmt.Println("Something....")
+			return
+		}
+		// fmt.Println("Something....")
+		// return
+	}
+	
 
 	fmt.Println("User ID:")
 	fmt.Println(result.ID)
