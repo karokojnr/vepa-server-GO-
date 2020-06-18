@@ -163,7 +163,6 @@ func ProfileHandler(w http.ResponseWriter, r *http.Request) {
 
 // FCMTokenHandler is...
 func FCMTokenHandler(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
 	w.Header().Set("Content-Type", "application/json")
 	tokenString := r.Header.Get("Authorization")
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
@@ -175,7 +174,6 @@ func FCMTokenHandler(w http.ResponseWriter, r *http.Request) {
 	})
 	var user model.User
 	var res model.ResponseResult
-
 	body, _ := ioutil.ReadAll(r.Body)
 	err = json.Unmarshal(body, &user)
 	collection, err := db.GetUserCollection()
@@ -208,9 +206,9 @@ func FCMTokenHandler(w http.ResponseWriter, r *http.Request) {
 		// 		{"fcmtoken", user.FCMToken},
 		// 	}},
 		// }
-		// _, err := collection.UpdateOne(context.TODO(), filter, update)
-		var result model.User
-		err := collection.FindOneAndUpdate(context.TODO(), filter, update).Decode(&result)
+		_, err := collection.UpdateOne(context.TODO(), filter, update)
+		// var result model.User
+		// err := collection.FindOneAndUpdate(context.TODO(), filter, update).Decode(&result)
 
 		if err != nil {
 			// fmt.Printf("FCMToken updated")
