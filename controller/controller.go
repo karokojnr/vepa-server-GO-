@@ -417,7 +417,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	id := r.Form.Get("id")
 	fmt.Println("User ID:")
 	fmt.Println(id)
-	filter := bson.M{"_id": "5eea8ff73e44c15ae9a6818d"}
+	filter := bson.M{"_id": id}
 	fmt.Println(filter)
 	//TODO: ERROR
 	var result model.User
