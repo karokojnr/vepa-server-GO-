@@ -346,6 +346,7 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 		fcmToken := claims["fcmToken"].(string)
 		// fmt.Println(userID)
 		log.Println(userID)
+		log.Println(fcmToken)
 
 		// userCollection, err := db.GetUserCollection()
 		// filter := bson.M{"_id": userID}
