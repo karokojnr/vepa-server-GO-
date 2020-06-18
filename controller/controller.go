@@ -182,37 +182,15 @@ func FCMTokenHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(res)
 		return
 	}
-	// var resultUser model.User
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		id := claims["id"].(string)
 		userID, _ := primitive.ObjectIDFromHex(id)
-		// fcmToken := claims["fcmToken"].(string)
 		filter := bson.M{"_id": userID}
 		// Read update model from body request
 		// _ = json.NewDecoder(r.Body).Decode(&user)
-		// Declare a filter that will change a field's integer value to `42`
-		fmt.Println("FCMToken Handler fcmtoken: ")
-		fmt.Println(user.FCMToken)
 		update := bson.M{"$set": bson.M{"fcmtoken": user.FCMToken}}
-		// update := bson.D{
-		// 	{"$set", bson.D {
-		// 		{"firstName", user.Firstname},
-		// 		{"lastName", user.Lastname},
-		// 		{"email", user.Email},
-		// 		{"idNumber", user.IDNumber},
-		// 		{"phoneNumber", user.PhoneNumber},
-		// 		{"password", user.Password},
-		// 		{"token", user.Token},
-		// 		{"exp", user.Exp},
-		// 		{"fcmtoken", user.FCMToken},
-		// 	}},
-		// }
 		_, err := collection.UpdateOne(context.TODO(), filter, update)
-		// var result model.User
-		// err := collection.FindOneAndUpdate(context.TODO(), filter, update).Decode(&result)
-
-		if err != nil {
-			// fmt.Printf("FCMToken updated")
+				if err != nil {
 			fmt.Printf("error...")
 			return
 
@@ -343,7 +321,7 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// var result model.Payment
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		userID := claims["id"].(string)
+		userID := claims["id"].(string)		
 		// fcmToken := claims["fcmToken"].(string)
 		fmt.Println("Payment Handeler Used ID:")
 		log.Println(userID)
@@ -442,11 +420,13 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	//extract userId
 
 	r.ParseForm() // Parses the request body
-	// id := r.Form.Get("id")
+	userID := r.Form.Get("id")
+	id, _ := primitive.ObjectIDFromHex(userID)
+
 	// fmt.Println("User ID:")
 	// fmt.Println("Callback Handler User ID:")
 	// fmt.Println(id)
-	filter := bson.M{"email": "ken@gmail.com"}
+	filter := bson.M{"_id": id}
 	fmt.Println(filter)
 	//TODO: ERROR
 	var result model.User
