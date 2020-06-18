@@ -12,8 +12,8 @@ import (
 	"vepa/util/db"
 
 	"github.com/AndroidStudyOpenSource/mpesa-api-go"
-	"github.com/appleboy/go-fcm"
-	// "github.com/NaySoftware/go-fcm"
+	// "github.com/appleboy/go-fcm"
+	"github.com/NaySoftware/go-fcm"
 	jwt "github.com/dgrijalva/jwt-go"
 	// "github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
@@ -114,7 +114,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id":    result.ID,
 		"email": result.Email,
-		
 	})
 
 	tokenString, err := token.SignedString([]byte("secret"))
@@ -347,7 +346,6 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 		// fcmToken := claims["fcmToken"].(string)
 		fmt.Println("Payment Handeler Used ID:")
 		log.Println(userID)
-		
 
 		// userCollection, err := db.GetUserCollection()
 		// filter := bson.M{"_id": userID}
@@ -468,23 +466,53 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(result.ID)
 	fmt.Println("FCMToken:")
 	fmt.Println(result.FCMToken)
-	msg := &fcm.Message{
-		To: result.FCMToken,
-		Data: map[string]interface{}{
-			"foo": "bar",
-		},
+	// msg := &fcm.Message{
+	// 	To: result.FCMToken,
+	// 	Data: map[string]interface{}{
+	// 		"foo": "bar",
+	// 	},
+	// }
+	// // Create a FCM client to send the message.
+	// client, err := fcm.NewClient("AAAACkklGVY:APA91bEGEFuh7dji5CJKRFz2ih4T8s2We4n3m1mvcnaW3_JoBs9hvkVxMm4ObsG3_MayGAuTnXh9ZoiwYJIN4tepf6xARJxFhOJimzwdEbSfLvhuGZO9FFpaYC5PS5b8SvdAeqscPiXQ")
+	// if err != nil {
+	// 	log.Fatalln(err)
+	// }
+	// // Send the message and receive the response without retries.
+	// response, err := client.Send(msg)
+	// if err != nil {
+	// 	log.Fatalln(err)
+	// }
+	// log.Printf("%#v\n", response)
+	const (
+		serverKey = "AAAACkklGVY:APA91bEGEFuh7dji5CJKRFz2ih4T8s2We4n3m1mvcnaW3_JoBs9hvkVxMm4ObsG3_MayGAuTnXh9ZoiwYJIN4tepf6xARJxFhOJimzwdEbSfLvhuGZO9FFpaYC5PS5b8SvdAeqscPiXQ"
+	)
+	data := map[string]string{
+		"msg": "Hello World1",
+		"sum": "Happy Day",
 	}
-	// Create a FCM client to send the message.
-	client, err := fcm.NewClient("AAAACkklGVY:APA91bEGEFuh7dji5CJKRFz2ih4T8s2We4n3m1mvcnaW3_JoBs9hvkVxMm4ObsG3_MayGAuTnXh9ZoiwYJIN4tepf6xARJxFhOJimzwdEbSfLvhuGZO9FFpaYC5PS5b8SvdAeqscPiXQ")
-	if err != nil {
-		log.Fatalln(err)
+
+	ids := []string{
+		result.FCMToken,
 	}
-	// Send the message and receive the response without retries.
-	response, err := client.Send(msg)
-	if err != nil {
-		log.Fatalln(err)
+
+	// xds := []string{
+	// 	"token5",
+	// 	"token6",
+	// 	"token7",
+	// }
+
+	c := fcm.NewFcmClient(serverKey)
+	c.NewFcmRegIdsMsg(ids, data)
+	// c.AppendDevices(xds)
+
+	status, err := c.Send()
+
+	if err == nil {
+		status.PrintResults()
+	} else {
+		fmt.Println(err)
 	}
-	log.Printf("%#v\n", response)
+
 	return
 
 }
