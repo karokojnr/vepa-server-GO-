@@ -469,7 +469,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("FCMToken:")
 	fmt.Println(result.FCMToken)
 	msg := &fcm.Message{
-		To: id,
+		To: result.FCMToken,
 		Data: map[string]interface{}{
 			"foo": "bar",
 		},
