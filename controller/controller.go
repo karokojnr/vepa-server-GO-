@@ -4,20 +4,17 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"log"
-	"net/http"
-	"reflect"
-	// "strconv"
 	"github.com/AndroidStudyOpenSource/mpesa-api-go"
 	"github.com/appleboy/go-fcm"
 	jwt "github.com/dgrijalva/jwt-go"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
+	"io/ioutil"
+	"log"
+	"net/http"
 	"vepa/model"
 	"vepa/util/db"
-	// "golang.org/x/tools/go/ssa/interp"
 )
 
 // RegisterHandler is...
@@ -190,7 +187,6 @@ func FCMTokenHandler(w http.ResponseWriter, r *http.Request) {
 			return
 
 		}
-		fmt.Printf("FCMToken updated")
 		res.Result = "FCMToken updated"
 		json.NewEncoder(w).Encode(res)
 		return
@@ -317,7 +313,6 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 	// var result model.Payment
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		userID := claims["id"].(string)
-		// fcmToken := claims["fcmToken"].(string)
 		fmt.Println("Payment Handeler Used ID:")
 		log.Println(userID)
 		_, err = collection.InsertOne(context.TODO(), payment)
@@ -328,7 +323,6 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		res.Result = "Payment Added Successfully"
 		json.NewEncoder(w).Encode(res)
-		// return
 
 		const (
 			appKey    = "WRnVsZ32lzmgQOVAoiANPAB9se2RYrB2"
@@ -368,7 +362,6 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 // CallBackHandler is...
 func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	fmt.Println("-----------Received M-Pesa webhook-----------")
 	var bd interface{}
 	rbody := r.Body
 	body, err := ioutil.ReadAll(rbody)
@@ -379,18 +372,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-
-	fmt.Println("Body:")
-	fmt.Println(bd)
-	fmt.Println(bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["ResultDesc"])
-
-	tp := reflect.TypeOf(string(body))
-	fmt.Println(tp)
-
-	log.Println(string(body))
-	fmt.Println(rbody)
-	// fmt.Println(JSON.stringify(req.body.Body.stkCallback.ResultDesc))
-	fmt.Println("---------------------------------------------")
+	// fmt.Println(bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["ResultDesc"])
 	var res model.ResponseResult
 	collection, err := db.GetUserCollection()
 	if err != nil {
@@ -401,7 +383,6 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	userID := r.Form.Get("id")
 	id, _ := primitive.ObjectIDFromHex(userID)
 	filter := bson.M{"_id": id}
-	fmt.Println(filter)
 
 	var result model.User
 	err = collection.FindOne(context.TODO(), filter).Decode(&result)
@@ -411,22 +392,14 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(res)
 			return
 		}
-		// fmt.Println("Something....")
-		// return
 	}
 	rBody := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["ResultDesc"]
-
-	fmt.Println("User ID:")
-	fmt.Println(result.ID)
-	fmt.Println("FCMToken:")
-	fmt.Println(result.FCMToken)
 	msg := &fcm.Message{
 		To: result.FCMToken,
 		Data: map[string]interface{}{
 			"title": "Vepa",
-			"body": rBody,
+			"body":  rBody,
 		},
-
 	}
 	// Create a FCM client to send the message.
 	client, err := fcm.NewClient("AAAACkklGVY:APA91bEGEFuh7dji5CJKRFz2ih4T8s2We4n3m1mvcnaW3_JoBs9hvkVxMm4ObsG3_MayGAuTnXh9ZoiwYJIN4tepf6xARJxFhOJimzwdEbSfLvhuGZO9FFpaYC5PS5b8SvdAeqscPiXQ")
