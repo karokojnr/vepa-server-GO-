@@ -7,8 +7,10 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"reflect"
 	"vepa/model"
 	"vepa/util/db"
+
 	// "strconv"
 
 	"github.com/AndroidStudyOpenSource/mpesa-api-go"
@@ -378,8 +380,10 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// desc := strconv.Itoa(body)
 	fmt.Println("Body:")
+	tp := reflect.TypeOf(body)
+	fmt.Println(tp)
 	fmt.Println(body)
-	fmt.Printf("%T", body)
+	log.Println(body)
 	// rb := rbody
 	fmt.Println(rbody)
 	// fmt.Println(JSON.stringify(req.body.Body.stkCallback.ResultDesc))
