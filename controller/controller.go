@@ -16,6 +16,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
+	"golang.org/x/tools/go/ssa/interp"
 )
 
 // RegisterHandler is...
@@ -369,6 +370,12 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	// var res model.ResponseResult
 	fmt.Println("-----------Received M-Pesa webhook-----------")
 	// rbody, _ := ioutil.ReadAll(r.Body)
+	
+var p map[string]string
+	_ = json.NewDecoder(r.Body).Decode(&p)
+    
+    // Do something with the p interface...
+    fmt.Fprintf(w, "Person: %+v", p)
 	rbody := r.Body
 	rb := rbody
 	fmt.Println(rb)
@@ -390,9 +397,9 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	//extract userId
 	r.ParseForm() // Parses the request body
-	fmt.Println("r.Form:")
-	rbb := r.Form.Get("Body")
-	fmt.Println(rbb)
+	// fmt.Println("r.Form:")
+	// rbb := r.Form.Get("Body")
+	// fmt.Println(rbb)
 	userID := r.Form.Get("id")
 	id, _ := primitive.ObjectIDFromHex(userID)
 	filter := bson.M{"_id": id}
