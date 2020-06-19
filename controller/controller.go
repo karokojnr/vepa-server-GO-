@@ -379,36 +379,24 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
+
 	fmt.Println("Body:")
-	fmt.Println(bd)
-	str := fmt.Sprintf("%v", bd)
-	fmt.Println(str)
+	fmt.Println(bd.(map[string]interface{})["stkCallback"].(map[string]interface{})["ResultDesc"])
+
 	tp := reflect.TypeOf(string(body))
 	fmt.Println(tp)
+
 	log.Println(string(body))
-	// rb := rbody
 	fmt.Println(rbody)
 	// fmt.Println(JSON.stringify(req.body.Body.stkCallback.ResultDesc))
 	fmt.Println("---------------------------------------------")
-	// Create the message to be sent.
-	// var user model.User
-	// body, _ := ioutil.ReadAll(r.Body)
-	// err := json.Unmarshal(body, &user)
 	var res model.ResponseResult
-	// if err != nil {
-	// 	res.Error = err.Error()
-	// 	json.NewEncoder(w).Encode(res)
-	// 	return
-	// }
 	collection, err := db.GetUserCollection()
 	if err != nil {
 		log.Fatal(err)
 	}
 	//extract userId
 	r.ParseForm() // Parses the request body
-	// fmt.Println("r.Form:")
-	// rbb := r.Form.Get("Body")
-	// fmt.Println(rbb)
 	userID := r.Form.Get("id")
 	id, _ := primitive.ObjectIDFromHex(userID)
 	filter := bson.M{"_id": id}
