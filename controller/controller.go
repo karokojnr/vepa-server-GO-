@@ -16,7 +16,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
-	"golang.org/x/tools/go/ssa/interp"
+	// "golang.org/x/tools/go/ssa/interp"
 )
 
 // RegisterHandler is...
