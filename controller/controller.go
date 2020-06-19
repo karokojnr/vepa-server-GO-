@@ -377,8 +377,9 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// desc := strconv.Itoa(body)
 	fmt.Println("Body:")
-	tp := reflect.TypeOf(body)
+	tp := reflect.TypeOf(string(body))
 	fmt.Println(tp)
+	// stk := body["stkCallback"]
 	fmt.Println(string(body))
 	log.Println(string(body))
 	// rb := rbody
