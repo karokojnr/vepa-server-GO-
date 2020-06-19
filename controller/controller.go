@@ -7,15 +7,12 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	// "time"
 	"vepa/model"
 	"vepa/util/db"
 
 	"github.com/AndroidStudyOpenSource/mpesa-api-go"
 	"github.com/appleboy/go-fcm"
-	// "github.com/NaySoftware/go-fcm"
 	jwt "github.com/dgrijalva/jwt-go"
-	// "github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
@@ -117,10 +114,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	})
 
 	tokenString, err := token.SignedString([]byte("secret"))
-	// ttl := 60 * time.Second
-	// exp := time.Now().UTC().Add(ttl).Unix()
-
-	// exp := time.Now().Add(time.Hour * time.Duration(1)).Unix()
 	exp := 60 * 60
 	fmt.Println("Expires in ... seconds: ")
 	fmt.Println(exp)
@@ -325,30 +318,6 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 		// fcmToken := claims["fcmToken"].(string)
 		fmt.Println("Payment Handeler Used ID:")
 		log.Println(userID)
-
-		// userCollection, err := db.GetUserCollection()
-		// filter := bson.M{"_id": userID}
-		// fmt.Println("User ID filter:....")
-		// fmt.Println(filter)
-		// if err != nil {
-		// 	log.Fatal(err)
-		// }
-		// var result model.User
-		// err = userCollection.FindOne(context.TODO(), filter).Decode(&result)
-		// if err != nil {
-		// 	if err.Error() == "mongo: no documents in result" {
-		// 		// res.Result = "Something went wrong, Please try again later!"
-		// 		// json.NewEncoder(w).Encode(res)
-		// 		// // return
-		// 		fmt.Println("Something....")
-		// 		return
-		// 	}
-		// 	// fmt.Println("Something....")
-		// 	// return
-		// }
-		// fmt.Println("User FCM Token Payment Handler:....")
-		// fmt.Println(result.FCMToken)
-
 		_, err = collection.InsertOne(context.TODO(), payment)
 		if err != nil {
 			res.Error = "Error While Making Payment, Try Again"
@@ -416,27 +385,19 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	//extract userId
-
 	r.ParseForm() // Parses the request body
 	userID := r.Form.Get("id")
 	id, _ := primitive.ObjectIDFromHex(userID)
-
-	// fmt.Println("User ID:")
-	// fmt.Println("Callback Handler User ID:")
-	// fmt.Println(id)
 	filter := bson.M{"_id": id}
 	fmt.Println(filter)
-	//TODO: ERROR
+	
 	var result model.User
 	err = collection.FindOne(context.TODO(), filter).Decode(&result)
 	if err != nil {
 		if err.Error() == "mongo: no documents in result" {
-			// res.Result = "Something went wrong, Please try again later!"
-			// json.NewEncoder(w).Encode(res)
-			// // return
-			fmt.Println("Something....")
+			res.Result = "Something went wrong, Please try again later!"
+			json.NewEncoder(w).Encode(res)
 			return
 		}
 		// fmt.Println("Something....")
@@ -466,36 +427,6 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatalln(err)
 	}
 	log.Printf("%#v\n", response)
-	// const (
-	// 	serverKey = "AAAACkklGVY:APA91bEGEFuh7dji5CJKRFz2ih4T8s2We4n3m1mvcnaW3_JoBs9hvkVxMm4ObsG3_MayGAuTnXh9ZoiwYJIN4tepf6xARJxFhOJimzwdEbSfLvhuGZO9FFpaYC5PS5b8SvdAeqscPiXQ"
-	// )
-	// data := map[string]string{
-	// 	"msg": "Hello World1",
-	// 	"sum": "Happy Day",
-	// }
-
-	// ids := []string{
-	// 	result.FCMToken,
-	// }
-
-	// // xds := []string{
-	// // 	"token5",
-	// // 	"token6",
-	// // 	"token7",
-	// // }
-
-	// c := fcm.NewFcmClient(serverKey)
-	// c.NewFcmRegIdsMsg(ids, data)
-	// // c.AppendDevices(xds)
-
-	// status, err := c.Send()
-
-	// if err == nil {
-	// 	status.PrintResults()
-	// } else {
-	// 	fmt.Println(err)
-	// }
-
 	return
 
 }
