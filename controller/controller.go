@@ -414,6 +414,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 		// fmt.Println("Something....")
 		// return
 	}
+	rBody := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["ResultDesc"]
 
 	fmt.Println("User ID:")
 	fmt.Println(result.ID)
@@ -422,10 +423,10 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	msg := &fcm.Message{
 		To: result.FCMToken,
 		Data: map[string]interface{}{
-			"foo": "bar",
-			// "title": "Vepa",
-			// "body": "Successful",
+			"title": "Vepa",
+			"body": rBody,
 		},
+
 	}
 	// Create a FCM client to send the message.
 	client, err := fcm.NewClient("AAAACkklGVY:APA91bEGEFuh7dji5CJKRFz2ih4T8s2We4n3m1mvcnaW3_JoBs9hvkVxMm4ObsG3_MayGAuTnXh9ZoiwYJIN4tepf6xARJxFhOJimzwdEbSfLvhuGZO9FFpaYC5PS5b8SvdAeqscPiXQ")
