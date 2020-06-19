@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"vepa/model"
 	"vepa/util/db"
+	"strconv"
 
 	"github.com/AndroidStudyOpenSource/mpesa-api-go"
 	"github.com/appleboy/go-fcm"
@@ -374,8 +375,10 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
     if err != nil {
         panic(err)
-    }
-    log.Println(string(body))
+	}
+	// desc := strconv.Itoa(body)
+	log.Println(string(body))
+	fmt.Printf("%T", body)
 	// rb := rbody
 	fmt.Println(rbody)
 	// fmt.Println(JSON.stringify(req.body.Body.stkCallback.ResultDesc))
