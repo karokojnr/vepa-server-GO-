@@ -387,7 +387,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Println("Body:")
-	fmt.Println(rbb)
+	fmt.Println(bd)
 	tp := reflect.TypeOf(string(body))
 	fmt.Println(tp)
 	log.Println(string(body))
