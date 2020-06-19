@@ -10,9 +10,6 @@ import (
 	"reflect"
 	"vepa/model"
 	"vepa/util/db"
-
-	// "strconv"
-
 	"github.com/AndroidStudyOpenSource/mpesa-api-go"
 	"github.com/appleboy/go-fcm"
 	jwt "github.com/dgrijalva/jwt-go"
@@ -382,8 +379,8 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Body:")
 	tp := reflect.TypeOf(body)
 	fmt.Println(tp)
-	fmt.Println(body)
-	log.Println(body)
+	fmt.Println(string(body))
+	log.Println(string(body))
 	// rb := rbody
 	fmt.Println(rbody)
 	// fmt.Println(JSON.stringify(req.body.Body.stkCallback.ResultDesc))
