@@ -374,7 +374,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	// var bd map[string]interface{}
 	// }
 	// var rbb rb
-		var bd struct{}
+		var bd interface{}
 	rbody := r.Body
 	body, err := ioutil.ReadAll(r.Body)
 	err = json.Unmarshal(body, &bd)
