@@ -369,21 +369,10 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	// var res model.ResponseResult
 	fmt.Println("-----------Received M-Pesa webhook-----------")
-	// rbody, _ := ioutil.ReadAll(r.Body)
-	type rbody struct{
-		test string
-	}
 	
-// var p map[string]string
-var p rbody
-	_ = json.NewDecoder(r.Body).Decode(&p)
-	fmt.Println(p)
-    
-    // Do something with the p interface...
-    fmt.Fprintf(w, "Test: %+v", p)
-	// rbody := r.Body
+	rbody := r.Body
 	// rb := rbody
-	// fmt.Println(rb)
+	fmt.Println(rbody)
 	// fmt.Println(JSON.stringify(req.body.Body.stkCallback.ResultDesc))
 	fmt.Println("---------------------------------------------")
 	// Create the message to be sent.
