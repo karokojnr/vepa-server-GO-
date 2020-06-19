@@ -371,10 +371,10 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	// var res model.ResponseResult
 	fmt.Println("-----------Received M-Pesa webhook-----------")
 	// type rb struct{
-	// var bd map[string]interface{}
+	var bd map[string]interface{}
 	// }
 	// var rbb rb
-		var bd interface{}
+		// var bd interface{}
 	rbody := r.Body
 	body, err := ioutil.ReadAll(r.Body)
 	err = json.Unmarshal(body, &bd)
@@ -388,6 +388,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("Body:")
 	fmt.Println(bd)
+	fmt.Println(bd["Body"])
 	tp := reflect.TypeOf(string(body))
 	fmt.Println(tp)
 	log.Println(string(body))
