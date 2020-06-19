@@ -370,14 +370,14 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	// var res model.ResponseResult
 	fmt.Println("-----------Received M-Pesa webhook-----------")
-	type rb struct{
-		bd map[string]interface{}
-	}
-	var rbb rb
+	// type rb struct{
+		var bd map[string]interface{}
+	// }
+	// var rbb rb
 	
 	rbody := r.Body
 	body, err := ioutil.ReadAll(r.Body)
-	err = json.Unmarshal(body, &rbb)
+	err = json.Unmarshal(body, &bd)
 	
 	if err != nil {
 		log.Println("eRROR")
