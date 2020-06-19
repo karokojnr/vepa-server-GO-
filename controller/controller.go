@@ -9,14 +9,14 @@ import (
 	"net/http"
 	"reflect"
 	// "strconv"
-	"vepa/model"
-	"vepa/util/db"
 	"github.com/AndroidStudyOpenSource/mpesa-api-go"
 	"github.com/appleboy/go-fcm"
 	jwt "github.com/dgrijalva/jwt-go"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
+	"vepa/model"
+	"vepa/util/db"
 	// "golang.org/x/tools/go/ssa/interp"
 )
 
@@ -185,7 +185,7 @@ func FCMTokenHandler(w http.ResponseWriter, r *http.Request) {
 		// _ = json.NewDecoder(r.Body).Decode(&user)
 		update := bson.M{"$set": bson.M{"fcmtoken": user.FCMToken}}
 		_, err := collection.UpdateOne(context.TODO(), filter, update)
-				if err != nil {
+		if err != nil {
 			fmt.Printf("error...")
 			return
 
@@ -316,7 +316,7 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// var result model.Payment
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		userID := claims["id"].(string)		
+		userID := claims["id"].(string)
 		// fcmToken := claims["fcmToken"].(string)
 		fmt.Println("Payment Handeler Used ID:")
 		log.Println(userID)
@@ -371,23 +371,23 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	// var res model.ResponseResult
 	fmt.Println("-----------Received M-Pesa webhook-----------")
 	// type rb struct{
-		var bd map[string]interface{}
+	var bd map[string]interface{}
 	// }
 	// var rbb rb
-	
+
 	rbody := r.Body
 	body, err := ioutil.ReadAll(r.Body)
 	err = json.Unmarshal(body, &bd)
-	
+
 	if err != nil {
 		log.Println("eRROR")
 	}
-    if err != nil {
-        panic(err)
+	if err != nil {
+		panic(err)
 	}
 
 	fmt.Println("Body:")
-	fmt.Println(bd)
+	fmt.Println(bd["stkCallback"])
 	tp := reflect.TypeOf(string(body))
 	fmt.Println(tp)
 	log.Println(string(body))
@@ -418,7 +418,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	id, _ := primitive.ObjectIDFromHex(userID)
 	filter := bson.M{"_id": id}
 	fmt.Println(filter)
-	
+
 	var result model.User
 	err = collection.FindOne(context.TODO(), filter).Decode(&result)
 	if err != nil {
@@ -440,7 +440,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 		Data: map[string]interface{}{
 			"foo": "bar",
 			// "title": "Vepa",
-            // "body": "Successful",
+			// "body": "Successful",
 		},
 	}
 	// Create a FCM client to send the message.
