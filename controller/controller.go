@@ -371,7 +371,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	// var res model.ResponseResult
 	fmt.Println("-----------Received M-Pesa webhook-----------")
 	type rb struct{
-		bd struct{}
+		bd map[string]interface{}
 	}
 	var rbb rb
 	
