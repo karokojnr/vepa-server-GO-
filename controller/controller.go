@@ -8,7 +8,7 @@ import (
 	"log"
 	"net/http"
 	"reflect"
-	"strconv"
+	// "strconv"
 	"vepa/model"
 	"vepa/util/db"
 	"github.com/AndroidStudyOpenSource/mpesa-api-go"
@@ -370,18 +370,26 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	// var res model.ResponseResult
 	fmt.Println("-----------Received M-Pesa webhook-----------")
+	type rb struct{
+		bd struct{}
+	}
+	var rbb rb
 	
 	rbody := r.Body
 	body, err := ioutil.ReadAll(r.Body)
+	err = json.Unmarshal(body, &rbb)
+	
+	if err != nil {
+		log.Println("eRROR")
+	}
     if err != nil {
         panic(err)
 	}
-	// desc := strconv.Itoa(body)
+
 	fmt.Println("Body:")
+	fmt.Println(rbb)
 	tp := reflect.TypeOf(string(body))
 	fmt.Println(tp)
-	
-	fmt.Println(strconv.Atoi( string(body)))
 	log.Println(string(body))
 	// rb := rbody
 	fmt.Println(rbody)
