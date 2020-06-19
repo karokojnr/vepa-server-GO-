@@ -368,7 +368,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	// var res model.ResponseResult
 	fmt.Println("-----------Received M-Pesa webhook-----------")
-	fmt.Println(w)
+	fmt.Println(r.Body)
 	// fmt.Println(JSON.stringify(req.body.Body.stkCallback.ResultDesc))
 	fmt.Println("---------------------------------------------")
 	// Create the message to be sent.
