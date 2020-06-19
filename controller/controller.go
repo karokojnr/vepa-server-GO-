@@ -381,6 +381,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Println("Body:")
+	fmt.Println(bd)
 	fmt.Println(bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["ResultDesc"])
 
 	tp := reflect.TypeOf(string(body))
