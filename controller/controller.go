@@ -371,6 +371,11 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("-----------Received M-Pesa webhook-----------")
 	
 	rbody := r.Body
+	body, err := ioutil.ReadAll(r.Body)
+    if err != nil {
+        panic(err)
+    }
+    log.Println(string(body))
 	// rb := rbody
 	fmt.Println(rbody)
 	// fmt.Println(JSON.stringify(req.body.Body.stkCallback.ResultDesc))
