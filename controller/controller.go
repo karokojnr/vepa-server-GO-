@@ -371,19 +371,19 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	// rbody, _ := ioutil.ReadAll(r.Body)
 	rbody := r.Body
 	rb := rbody
-	fmt.Println(&rb)
+	fmt.Println(rb)
 	// fmt.Println(JSON.stringify(req.body.Body.stkCallback.ResultDesc))
 	fmt.Println("---------------------------------------------")
 	// Create the message to be sent.
-	var user model.User
-	body, _ := ioutil.ReadAll(r.Body)
-	err := json.Unmarshal(body, &user)
+	// var user model.User
+	// body, _ := ioutil.ReadAll(r.Body)
+	// err := json.Unmarshal(body, &user)
 	var res model.ResponseResult
-	if err != nil {
-		res.Error = err.Error()
-		json.NewEncoder(w).Encode(res)
-		return
-	}
+	// if err != nil {
+	// 	res.Error = err.Error()
+	// 	json.NewEncoder(w).Encode(res)
+	// 	return
+	// }
 	collection, err := db.GetUserCollection()
 	if err != nil {
 		log.Fatal(err)
