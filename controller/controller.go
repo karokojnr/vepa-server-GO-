@@ -368,27 +368,21 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 // CallBackHandler is...
 func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	// var res model.ResponseResult
 	fmt.Println("-----------Received M-Pesa webhook-----------")
-	// type rb struct{
-	var bd map[string]interface{}
-	// }
-	// var rbb rb
-		// var bd interface{}
+	var bd interface{}
 	rbody := r.Body
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := ioutil.ReadAll(rbody)
 	err = json.Unmarshal(body, &bd)
-
 	if err != nil {
 		log.Println("eRROR")
 	}
 	if err != nil {
 		panic(err)
 	}
-
 	fmt.Println("Body:")
 	fmt.Println(bd)
-	fmt.Println(bd["Body"])
+	str := fmt.Sprintf("%v", bd)
+	fmt.Println(str)
 	tp := reflect.TypeOf(string(body))
 	fmt.Println(tp)
 	log.Println(string(body))
