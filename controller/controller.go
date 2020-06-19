@@ -261,7 +261,8 @@ func UserVehiclesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		userID := claims["id"].(string)
+		id := claims["id"].(string)
+userID, _ := primitive.ObjectIDFromHex(id)
 		filter := bson.M{"userId": userID}
 		cur, err := collection.Find(context.TODO(), filter)
 		if err != nil {
