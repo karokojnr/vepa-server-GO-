@@ -373,12 +373,13 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	
 var p map[string]string
 	_ = json.NewDecoder(r.Body).Decode(&p)
+	fmt.Println(p)
     
     // Do something with the p interface...
-    fmt.Fprintf(w, "Person: %+v", p)
-	rbody := r.Body
-	rb := rbody
-	fmt.Println(rb)
+    // fmt.Fprintf(w, "Person: %+v", p)
+	// rbody := r.Body
+	// rb := rbody
+	// fmt.Println(rb)
 	// fmt.Println(JSON.stringify(req.body.Body.stkCallback.ResultDesc))
 	fmt.Println("---------------------------------------------")
 	// Create the message to be sent.
