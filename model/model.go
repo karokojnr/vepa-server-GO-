@@ -29,7 +29,9 @@ type Vehicle struct {
 
 // Payment is...
 type Payment struct {
-	Amount int `bson:"amount" json:"amount"`
+	Days       int    `bson:"days" json:"days"`
+	VehicleReg string `bson:"vehicleReg" json:"vehicleReg"`
+	Amount     int    `bson:"amount" json:"amount"`
 }
 
 // ResponseResult is...
