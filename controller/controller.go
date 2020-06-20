@@ -373,6 +373,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println(bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"])
 	// fmt.Println(bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["ResultDesc"])
 	var res model.ResponseResult
 	collection, err := db.GetUserCollection()
