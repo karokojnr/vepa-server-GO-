@@ -29,7 +29,7 @@ type Vehicle struct {
 
 // Payment is...
 type Payment struct {
-	Days       int    `bson:"days" json:"days"`
+	Days       interface{}    `bson:"days" json:"days"`
 	VehicleReg string `bson:"vehicleReg" json:"vehicleReg"`
 	Amount     int    `bson:"amount" json:"amount"`
 }
