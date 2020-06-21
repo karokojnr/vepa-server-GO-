@@ -339,7 +339,7 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 			Password:          "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjAwNDIxMTc1NTU1",
 			Timestamp:         "20200421175555",
 			TransactionType:   "CustomerPayBillOnline",
-			Amount:            1,
+			Amount:            payment.Amount,
 			PartyA:            "254799338805",
 			PartyB:            "174379",
 			PhoneNumber:       "254799338805",
