@@ -23,7 +23,6 @@ type User struct {
 type Vehicle struct {
 	RegistrationNumber string `bson:"registrationNumber" json:"registrationNumber"`
 	VehicleClass       string `bson:"vehicleClass" json:"vehicleClass"`
-	VehicleModel       string `bson:"vehicleModel" json:"vehicleModel"`
 	UserID             string `bson:"userId" json:"userId"`
 }
 
