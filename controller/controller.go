@@ -504,6 +504,8 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 		"resultDesc":   rBody,
 		"isSuccessful": true,
 	}}
+	log.Println("payment update")
+	log.Println(paymentUpdate)
 	_, errp := paymentCollection.UpdateMany(context.TODO(), paymentFilter, paymentUpdate)
 	if errp != nil {
 		fmt.Printf("error...")
