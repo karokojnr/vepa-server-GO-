@@ -32,7 +32,7 @@ type Payment struct {
 	VehicleReg         string      `bson:"vehicleReg" json:"vehicleReg"`
 	Amount             int         `bson:"amount" json:"amount"`
 	MpesaReceiptNumber string      `bson:"mpesaReceiptNumber" json:"mpesaReceiptNumber"`
-	ResultCode         string      `bson:"resultCode" json:"resultCode"`
+	ResultCode         int      `bson:"resultCode" json:"resultCode"`
 	ResultDesc         string      `bson:"resultDesc" json:"resultDesc"`
 	TransactionDate    string      `bson:"transactionDate" json:"transactionDate"`
 	PhoneNumber        string      `bson:"phoneNumber" json:"phoneNumber"`
