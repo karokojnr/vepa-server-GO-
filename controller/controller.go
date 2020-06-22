@@ -501,7 +501,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	paymentFilter := bson.M{"userId": id}
 	// var payment model.Payment
 	if resultCode == 0 {
-		update := bson.M{"$set": bson.M{"resultCode": resultCode,
+		update := bson.M{"$set": bson.M{
 			"resultDesc":   rBody,
 			"isSuccessful": true,
 		}}
