@@ -489,7 +489,6 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	resultCode := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["ResultCode"]
 	rBody := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["ResultDesc"]
 
-
 	log.Println("resultCode:")
 	log.Println(resultCode)
 	log.Println("resultDesc:")
@@ -501,22 +500,21 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	paymentFilter := bson.M{"userId": id}
 	// var payment model.Payment
 	// if resultCode == 0 {
-		update := bson.M{"$set": bson.M{"resultCode": resultCode,
-			"resultDesc":   rBody,
-			"isSuccessful": true,
-		}}
-		_, errp := paymentCollection.UpdateOne(context.TODO(), paymentFilter, update)
-		if errp != nil {
-			fmt.Printf("error...")
-			return
+	paymentUpdate := bson.M{"$set": bson.M{"resultCode": resultCode,
+		"resultDesc":   rBody,
+		"isSuccessful": true,
+	}}
+	_, errp := paymentCollection.UpdateMany(context.TODO(), paymentFilter, paymentUpdate)
+	if errp != nil {
+		fmt.Printf("error...")
+		return
 
-		}
-		res.Result = "Payment updated"
-		json.NewEncoder(w).Encode(res)
-		// return
+	}
+	res.Result = "Payment updated"
+	json.NewEncoder(w).Encode(res)
+	// return
 
 	// }
-
 
 	//Send message...
 	msg := &fcm.Message{
