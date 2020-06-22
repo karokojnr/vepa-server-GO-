@@ -497,7 +497,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	paymentFilter := bson.M{"userId": id}
 	var payment model.Payment
-	update := bson.M{"$set": bson.M{"resultCode": payment.ResultCode}}
+	update := bson.M{"$set": bson.M{"resultCode": resultCode}}
 	_, errp := paymentCollection.UpdateOne(context.TODO(), paymentFilter, update)
 	if errp != nil {
 		fmt.Printf("error...")
