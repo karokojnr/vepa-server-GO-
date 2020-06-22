@@ -486,7 +486,29 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	resultCode := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["ResultCode"]
 	rBody := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["ResultDesc"]
+
+	log.Println("resultCode:")
+	log.Println(resultCode)
+	paymentCollection, err := db.GetPaymentCollection()
+	if err != nil {
+		log.Fatal(err)
+	}
+	paymentFilter := bson.M{"userId": id}
+	var payment model.Payment
+	update := bson.M{"$set": bson.M{"resultCode": payment.ResultCode}}
+	_, errp := paymentCollection.UpdateOne(context.TODO(), paymentFilter, update)
+	if errp != nil {
+		fmt.Printf("error...")
+		return
+
+	}
+	res.Result = "Payment updated"
+	json.NewEncoder(w).Encode(res)
+	// return
+
+	//Send message...
 	msg := &fcm.Message{
 		To: result.FCMToken,
 		Data: map[string]interface{}{
