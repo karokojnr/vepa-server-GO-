@@ -500,8 +500,8 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	paymentFilter := bson.M{"userId": id}
 	// var payment model.Payment
-	if resultCode == 0 {
-		update := bson.M{"$set": bson.M{
+	// if resultCode == 0 {
+		update := bson.M{"$set": bson.M{"resultCode": resultCode,
 			"resultDesc":   rBody,
 			"isSuccessful": true,
 		}}
@@ -513,11 +513,10 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		res.Result = "Payment updated"
 		json.NewEncoder(w).Encode(res)
-		return
+		// return
 
-	}
+	// }
 
-	// return
 
 	//Send message...
 	msg := &fcm.Message{
