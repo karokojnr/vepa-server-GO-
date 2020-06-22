@@ -489,8 +489,11 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	resultCode := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["ResultCode"]
 	rBody := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["ResultDesc"]
 
+
 	log.Println("resultCode:")
 	log.Println(resultCode)
+	log.Println("resultDesc:")
+	log.Println(rBody)
 	paymentCollection, err := db.GetPaymentCollection()
 	if err != nil {
 		log.Fatal(err)
@@ -500,7 +503,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	if resultCode == 0 {
 		update := bson.M{"$set": bson.M{"resultCode": resultCode,
 			"resultDesc":   rBody,
-			"IsSuccessful": true,
+			"isSuccessful": true,
 		}}
 		_, errp := paymentCollection.UpdateOne(context.TODO(), paymentFilter, update)
 		if errp != nil {
@@ -510,6 +513,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		res.Result = "Payment updated"
 		json.NewEncoder(w).Encode(res)
+		return
 
 	}
 
