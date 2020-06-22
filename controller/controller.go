@@ -506,12 +506,13 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	}}
 	log.Println("payment update")
 	log.Println(paymentUpdate)
-	_, errp := paymentCollection.UpdateMany(context.TODO(), paymentFilter, paymentUpdate)
+	p, errp := paymentCollection.UpdateOne(context.TODO(), paymentFilter, paymentUpdate)
 	if errp != nil {
 		fmt.Printf("error...")
 		return
 
 	}
+	log.Println(p)
 	res.Result = "Payment updated"
 	json.NewEncoder(w).Encode(res)
 	// return
