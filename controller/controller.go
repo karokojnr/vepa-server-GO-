@@ -153,6 +153,52 @@ func ProfileHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+// EditProfileHandler is...
+func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	tokenString := r.Header.Get("Authorization")
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		// Don't forget to validate the alg is what you expect:
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method")
+		}
+		return []byte("secret"), nil
+	})
+	var user model.User
+	var res model.ResponseResult
+	body, _ := ioutil.ReadAll(r.Body)
+	err = json.Unmarshal(body, &user)
+	collection, err := db.GetUserCollection()
+	if err != nil {
+		res.Error = err.Error()
+		json.NewEncoder(w).Encode(res)
+		return
+	}
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		id := claims["id"].(string)
+		userID, _ := primitive.ObjectIDFromHex(id)
+		filter := bson.M{"userId": userID}
+		// Read update model from body request
+		// _ = json.NewDecoder(r.Body).Decode(&user)
+		update := bson.M{"$set": bson.M{
+			"firstName":   user.Firstname,
+			"lastName":    user.Lastname,
+			"email":       user.Email,
+			"idNumber":    user.IDNumber,
+			"phoneNumber": user.PhoneNumber,
+		}}
+		_, err := collection.UpdateOne(context.TODO(), filter, update)
+		if err != nil {
+			fmt.Printf("error...")
+			return
+
+		}
+		res.Result = "User updated Successfully"
+		json.NewEncoder(w).Encode(res)
+		return
+	}
+}
+
 // FCMTokenHandler is...
 func FCMTokenHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -241,6 +287,49 @@ func AddVehicleHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+// EditVehicleHandler is...
+func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	tokenString := r.Header.Get("Authorization")
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		// Don't forget to validate the alg is what you expect:
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method")
+		}
+		return []byte("secret"), nil
+	})
+	var vehicle model.Vehicle
+	var res model.ResponseResult
+	body, _ := ioutil.ReadAll(r.Body)
+	err = json.Unmarshal(body, &vehicle)
+	collection, err := db.GetVehicleCollection()
+	if err != nil {
+		res.Error = err.Error()
+		json.NewEncoder(w).Encode(res)
+		return
+	}
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		id := claims["id"].(string)
+		userID, _ := primitive.ObjectIDFromHex(id)
+		filter := bson.M{"userId": userID}
+		// Read update model from body request
+		// _ = json.NewDecoder(r.Body).Decode(&user)
+		update := bson.M{"$set": bson.M{
+			"registrationNumber": vehicle.RegistrationNumber,
+			"vehicleClass":       vehicle.UserID,
+		}}
+		_, err := collection.UpdateOne(context.TODO(), filter, update)
+		if err != nil {
+			fmt.Printf("error...")
+			return
+
+		}
+		res.Result = "Vehicle updated successfully"
+		json.NewEncoder(w).Encode(res)
+		return
+	}
+}
+
 // UserVehiclesHandler is...
 func UserVehiclesHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-TYpe", "application/json")
@@ -262,7 +351,7 @@ func UserVehiclesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		userID := claims["id"].(string)
-// userID, _ := primitive.ObjectIDFromHex(id)
+		// userID, _ := primitive.ObjectIDFromHex(id)
 		filter := bson.M{"userId": userID}
 		cur, err := collection.Find(context.TODO(), filter)
 		if err != nil {
@@ -314,7 +403,7 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 	// var result model.Payment
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		userID := claims["id"].(string)
-		payment.UserID = userID;
+		payment.UserID = userID
 		fmt.Println("Payment Handeler Used ID:")
 		log.Println(userID)
 		_, err = collection.InsertOne(context.TODO(), payment)
