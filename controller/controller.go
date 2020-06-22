@@ -314,6 +314,7 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 	// var result model.Payment
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		userID := claims["id"].(string)
+		payment.UserID = userID;
 		fmt.Println("Payment Handeler Used ID:")
 		log.Println(userID)
 		_, err = collection.InsertOne(context.TODO(), payment)

@@ -31,6 +31,7 @@ type Payment struct {
 	Days       interface{}    `bson:"days" json:"days"`
 	VehicleReg string `bson:"vehicleReg" json:"vehicleReg"`
 	Amount     int    `bson:"amount" json:"amount"`
+	UserID             string `bson:"userId" json:"userId"`
 }
 
 // ResponseResult is...
