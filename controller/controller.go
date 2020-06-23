@@ -228,6 +228,8 @@ func FCMTokenHandler(w http.ResponseWriter, r *http.Request) {
 		filter := bson.M{"_id": userID}
 		// Read update model from body request
 		// _ = json.NewDecoder(r.Body).Decode(&user)
+		log.Println("fcmtoken")
+		log.Println(user.FCMToken)
 		update := bson.M{"$set": bson.M{"fcmtoken": user.FCMToken}}
 		_, err := collection.UpdateOne(context.TODO(), filter, update)
 		if err != nil {
