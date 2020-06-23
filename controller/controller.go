@@ -424,9 +424,9 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(res)
 			return
 		}
-		
+
 		// pID:= payment.PaymentID
-		
+
 		res.Result = "Payment Added Successfully"
 		json.NewEncoder(w).Encode(res)
 
@@ -448,7 +448,7 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 			PartyA:            "254799338805",
 			PartyB:            "174379",
 			PhoneNumber:       "254799338805",
-			CallBackURL:       "https://vepa-server-go.herokuapp.com/rcb?id=" + userID,
+			CallBackURL:       "https://vepa-server-go.herokuapp.com/rcb?id=" + userID + "&paymentid=" + payment.PaymentID.String(),
 			AccountReference:  "Vepa",
 			TransactionDesc:   "Vepa Payment",
 		})
@@ -488,6 +488,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	//extract userId
 	r.ParseForm() // Parses the request body
 	userID := r.Form.Get("id")
+	paymentID := r.Form.Get("paymentid")
 	id, _ := primitive.ObjectIDFromHex(userID)
 	filter := bson.M{"_id": id}
 
@@ -516,7 +517,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	// if resultCode == 0 {
 	var paymenModel model.Payment
 	fmt.Println("Payment ID")
-		log.Println(paymenModel.PaymentID)
+	log.Println(paymentID)
 	_ = json.NewDecoder(r.Body).Decode(&paymenModel)
 	paymentUpdate := bson.M{"$set": bson.M{"resultCode": resultCode,
 		"resultDesc":   rBody,
