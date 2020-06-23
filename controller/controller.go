@@ -336,7 +336,7 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 		}}
 		log.Println(update)
 		// var result model.Vehicle
-		_, err := collection.UpdateOne(context.TODO(), filter, update)
+		_, err := collection.ReplaceOne(context.TODO(), filter, update)
 		if err != nil {
 			fmt.Printf("Could not update!")
 			return
