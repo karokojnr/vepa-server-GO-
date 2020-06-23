@@ -340,8 +340,8 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 			"vehicleClass":       vehicle.UserID,
 		}}
 		log.Println(update)
-		// var result model.Vehicle
-		err := collection.FindOneAndUpdate(context.TODO(), filter, update).Decode(&vehicle)
+		var result model.Vehicle
+		err := collection.FindOneAndUpdate(context.TODO(), filter, update).Decode(&result)
 
 		if err != nil {
 			res.Error = "Unsuccessful!"
