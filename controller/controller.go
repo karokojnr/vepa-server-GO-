@@ -424,8 +424,9 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(res)
 			return
 		}
-		fmt.Println("Payment ID")
-		log.Println(payment.PaymentID)
+		
+		// pID:= payment.PaymentID
+		
 		res.Result = "Payment Added Successfully"
 		json.NewEncoder(w).Encode(res)
 
@@ -514,6 +515,8 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	// var payment model.Payment
 	// if resultCode == 0 {
 	var paymenModel model.Payment
+	fmt.Println("Payment ID")
+		log.Println(paymenModel.PaymentID)
 	_ = json.NewDecoder(r.Body).Decode(&paymenModel)
 	paymentUpdate := bson.M{"$set": bson.M{"resultCode": resultCode,
 		"resultDesc":   rBody,
