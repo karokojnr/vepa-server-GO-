@@ -7,6 +7,7 @@ import (
 	"github.com/AndroidStudyOpenSource/mpesa-api-go"
 	"github.com/appleboy/go-fcm"
 	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
@@ -298,6 +299,11 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return []byte("secret"), nil
 	})
+	var params = mux.Vars(r)
+	//Get id from parameters
+	id, _ := primitive.ObjectIDFromHex(params["id"])
+
+	
 	var vehicle model.Vehicle
 	var res model.ResponseResult
 	body, _ := ioutil.ReadAll(r.Body)
@@ -309,9 +315,11 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		id := claims["id"].(string)
-		userID, _ := primitive.ObjectIDFromHex(id)
-		filter := bson.M{"userId": userID}
+		//Use vehicle Id
+		userid := claims["id"].(string)
+		_, _ = primitive.ObjectIDFromHex(userid)
+		
+		filter := bson.M{"userId": id}
 		// Read update model from body request
 		// _ = json.NewDecoder(r.Body).Decode(&user)
 		update := bson.M{"$set": bson.M{
