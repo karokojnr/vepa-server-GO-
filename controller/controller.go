@@ -507,6 +507,8 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 
 
 
+	fmt.Println("mpesa receipt number:")
+	fmt.Println(mpesaReceiptNumber)
 	log.Println("resultCode:")
 	log.Println(resultCode)
 	log.Println("resultDesc:")
