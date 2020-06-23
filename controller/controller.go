@@ -331,7 +331,7 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		vehicle.VeicleID = id
 
-	json.NewEncoder(w).Encode(vehicle)
+		json.NewEncoder(w).Encode(vehicle)
 		// log.Println("Past could not update!")
 		// res.Result = "Vehicle updated successfully"
 		// // json.NewEncoder(w).Encode(res)
@@ -510,19 +510,20 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	paymentFilter := bson.M{"userId": id}
 	// var payment model.Payment
 	// if resultCode == 0 {
+	var paymenModel model.Vehicle
 	paymentUpdate := bson.M{"$set": bson.M{"resultCode": resultCode,
 		"resultDesc":   rBody,
 		"isSuccessful": true,
 	}}
 	log.Println("payment update")
 	log.Println(paymentUpdate)
-	p, errp := paymentCollection.UpdateOne(context.TODO(), paymentFilter, paymentUpdate)
+	errp := paymentCollection.FindOneAndUpdate(context.TODO(), paymentFilter, paymentUpdate).Decode(&paymenModel)
 	if errp != nil {
 		fmt.Printf("error...")
 		return
 
 	}
-	log.Println(p)
+	// log.Println(p)
 	res.Result = "Payment updated"
 	json.NewEncoder(w).Encode(res)
 	// return
