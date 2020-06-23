@@ -305,8 +305,11 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 	// id, _ := primitive.ObjectIDFromHex(params["id"])
 	r.ParseForm() // Parses the request body
 	vehicleid := r.Form.Get("id")
-	id, _ := primitive.ObjectIDFromHex(vehicleid)
 	log.Println("vehicle id")
+	log.Println(vehicleid)
+
+	id, _ := primitive.ObjectIDFromHex(vehicleid)
+	log.Println("id")
 	log.Println(id)
 
 	var vehicle model.Vehicle
@@ -323,8 +326,9 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		//Use vehicle Id
-		userid := claims["id"].(string)
-		_, _ = primitive.ObjectIDFromHex(userid)
+		_ = claims["id"].(string)
+		
+		// _, _ = primitive.ObjectIDFromHex(userid)
 
 		filter := bson.M{"_id": id}
 		// Read update model from body request
