@@ -332,6 +332,7 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 			"registrationNumber": vehicle.RegistrationNumber,
 			// "vehicleClass":       vehicle.UserID,
 		}}
+		log.Println(update)
 		// var result model.Vehicle
 		_, err := collection.UpdateOne(context.TODO(), filter, update)
 		if err != nil {
