@@ -341,7 +341,7 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 		// res.Result = "Vehicle updated successfully"
 		// json.NewEncoder(w).Encode(res)
 		vehicle.ID = id
-		json.NewEncoder(w).Encode(result)
+		json.NewEncoder(w).Encode(vehicle)
 		return
 	}
 }
