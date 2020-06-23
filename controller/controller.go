@@ -307,8 +307,10 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 
 	var vehicle model.Vehicle
 	var res model.ResponseResult
-	body, _ := ioutil.ReadAll(r.Body)
-	err = json.Unmarshal(body, &vehicle)
+	// body, _ := ioutil.ReadAll(r.Body)
+	// err = json.Unmarshal(body, &vehicle)
+	// Read update model from body request
+	_ = json.NewDecoder(r.Body).Decode(&vehicle)
 	collection, err := db.GetVehicleCollection()
 	if err != nil {
 		res.Error = err.Error()
@@ -327,7 +329,7 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 			"registrationNumber": vehicle.RegistrationNumber,
 			"vehicleClass":       vehicle.UserID,
 		}}
-		_, err := collection.UpdateOne(context.TODO(), filter, update)
+		err := collection.FindOneAndUpdate(context.TODO(), filter, update).Decode(&vehicle)
 		if err != nil {
 			fmt.Printf("error...")
 			return
