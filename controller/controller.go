@@ -324,6 +324,12 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		//Use vehicle Id
 		_ = claims["id"].(string)
+		err := collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&book)
+
+		if err != nil {
+			log.Println("Vehicle not found")
+			return
+		}
 		filter := bson.M{"_id": id}
 		log.Println("filter")
 		log.Println(filter)
@@ -336,7 +342,7 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 		}}
 		log.Println(update)
 		// var result model.Vehicle
-		_, err := collection.ReplaceOne(context.TODO(), filter, update)
+		_, err := collection.UpdateOne(context.TODO(), filter, update)
 		if err != nil {
 			fmt.Printf("Could not update!")
 			return

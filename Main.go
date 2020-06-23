@@ -2,12 +2,11 @@ package main
 
 import (
 	"fmt"
+	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"os"
 	"vepa/controller"
-
-	"github.com/gorilla/mux"
 )
 
 func main() {
@@ -16,7 +15,7 @@ func main() {
 	r.HandleFunc("/register", controller.RegisterHandler).Methods("POST")
 	r.HandleFunc("/login", controller.LoginHandler).Methods("POST")
 	r.HandleFunc("/addVehicle", controller.AddVehicleHandler).Methods("POST")
-	r.HandleFunc("/editVehicle/{id}", controller.EditVehicleHandler).Methods("PATCH")
+	r.HandleFunc("/editVehicle/{id}", controller.EditVehicleHandler).Methods("PUT")
 	r.HandleFunc("/makePayment", controller.PaymentHandler).Methods("POST")
 	r.HandleFunc("/rcb", controller.CallBackHandler).Methods("POST")
 	r.HandleFunc("/token", controller.FCMTokenHandler).Methods("PUT")
