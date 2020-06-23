@@ -328,7 +328,7 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 		// _ = json.NewDecoder(r.Body).Decode(&user)
 		update := bson.M{"$set": bson.M{
 			"registrationNumber": vehicle.RegistrationNumber,
-			"vehicleClass":       vehicle.UserID,
+			// "vehicleClass":       vehicle.UserID,
 		}}
 		// var result model.Vehicle
 		_,err := collection.UpdateOne(context.TODO(), filter, update)
