@@ -21,10 +21,10 @@ type User struct {
 
 // Vehicle is...
 type Vehicle struct {
-	ID          primitive.ObjectID `bson:"_id" json:"_id,omitempty"`
-	RegistrationNumber string `bson:"registrationNumber" json:"registrationNumber"`
-	VehicleClass       string `bson:"vehicleClass" json:"vehicleClass"`
-	UserID             string `bson:"userId" json:"userId"`
+	VeicleID           primitive.ObjectID `bson:"_id" json:"_id,omitempty"`
+	RegistrationNumber string             `bson:"registrationNumber" json:"registrationNumber"`
+	VehicleClass       string             `bson:"vehicleClass" json:"vehicleClass"`
+	UserID             string             `bson:"userId" json:"userId"`
 }
 
 // Payment is...
@@ -33,7 +33,7 @@ type Payment struct {
 	VehicleReg         string      `bson:"vehicleReg" json:"vehicleReg"`
 	Amount             int         `bson:"amount" json:"amount"`
 	MpesaReceiptNumber string      `bson:"mpesaReceiptNumber" json:"mpesaReceiptNumber"`
-	ResultCode         int      `bson:"resultCode" json:"resultCode"`
+	ResultCode         int         `bson:"resultCode" json:"resultCode"`
 	ResultDesc         string      `bson:"resultDesc" json:"resultDesc"`
 	TransactionDate    string      `bson:"transactionDate" json:"transactionDate"`
 	PhoneNumber        string      `bson:"phoneNumber" json:"phoneNumber"`

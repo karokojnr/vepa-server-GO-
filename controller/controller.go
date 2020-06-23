@@ -268,7 +268,7 @@ func AddVehicleHandler(w http.ResponseWriter, r *http.Request) {
 	var result model.Vehicle
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		vehicle.UserID = claims["id"].(string)
-		vehicle.ID = primitive.NewObjectID()
+		vehicle.VeicleID = primitive.NewObjectID()
 		err = collection.FindOne(context.TODO(), bson.M{"registrationNumber": vehicle.RegistrationNumber}).Decode(&result)
 		if err != nil {
 			if err.Error() == "mongo: no documents in result" {
