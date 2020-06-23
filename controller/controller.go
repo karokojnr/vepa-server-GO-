@@ -321,9 +321,6 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		//Use vehicle Id
 		_ = claims["id"].(string)
-		
-		// _, _ = primitive.ObjectIDFromHex(userid)
-
 		filter := bson.M{"_id": id}
 		log.Println("filter")
 		log.Println(filter)
@@ -333,17 +330,17 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 			"registrationNumber": vehicle.RegistrationNumber,
 			"vehicleClass":       vehicle.UserID,
 		}}
-		err := collection.FindOneAndUpdate(context.TODO(), filter, update).Decode(&vehicle)
+		var result model.Vehicle
+		err := collection.FindOneAndUpdate(context.TODO(), filter, update).Decode(&result)
 		if err != nil {
-			fmt.Printf("error...")
+			fmt.Printf("Could not update!")
 			return
 
 		}
 		// res.Result = "Vehicle updated successfully"
 		// json.NewEncoder(w).Encode(res)
 		vehicle.ID = id
-
-		json.NewEncoder(w).Encode(vehicle)
+		json.NewEncoder(w).Encode(result)
 		return
 	}
 }
