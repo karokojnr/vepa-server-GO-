@@ -305,7 +305,7 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 	})
 	var params = mux.Vars(r)
 	//Get id from parameters
-	vehicleid := params["id"]	
+	vehicleid := params["id"]
 	id, _ := primitive.ObjectIDFromHex(vehicleid)
 	var vehicle model.Vehicle
 	var res model.ResponseResult
@@ -322,7 +322,7 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 		// _ = claims["id"].(string)
 		// findVeehicleFilter := bson.M{"_id": id}
 		// log.Println("Find vehicle")
-		// log.Println(findVeehicleFilter) 
+		// log.Println(findVeehicleFilter)
 		// var resultvshicle model.Vehicle
 		// err := collection.FindOne(context.TODO(), findVeehicleFilter).Decode(&resultvshicle)
 		// if err != nil {
@@ -341,11 +341,13 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 		}}
 		log.Println(update)
 		// var result model.Vehicle
-		_, errv := collection.UpdateOne(context.TODO(), filter, update)
-		if errv != nil {
-			fmt.Printf("Could not update!")
-			return
+		err := collection.FindOneAndUpdate(context.TODO(), filter, update).Decode(&vehicle)
 
+		if err != nil {
+			res.Error = "Unsuccessful!"
+			json.NewEncoder(w).Encode(res)
+
+			return
 		}
 		log.Println("Past could not update!")
 		res.Result = "Vehicle updated successfully"
