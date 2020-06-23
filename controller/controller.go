@@ -323,7 +323,10 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 	if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		//Use vehicle Id
 		// _ = claims["id"].(string)
-		err := collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&vehicle)
+		findVeehicleFilter := bson.M{"_id": id}
+		log.Println("Find vehicle")
+		log.Println(findVeehicleFilter) 
+		err := collection.FindOne(context.TODO(), findVeehicleFilter).Decode(&vehicle)
 		if err != nil {
 			log.Println("Vehicle not found")
 			return
