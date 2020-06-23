@@ -323,7 +323,7 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 		//Use vehicle Id
 		userid := claims["id"].(string)
 		_, _ = primitive.ObjectIDFromHex(userid)
-		
+
 		filter := bson.M{"_id": id}
 		// Read update model from body request
 		// _ = json.NewDecoder(r.Body).Decode(&user)
@@ -337,8 +337,11 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 			return
 
 		}
-		res.Result = "Vehicle updated successfully"
-		json.NewEncoder(w).Encode(res)
+		// res.Result = "Vehicle updated successfully"
+		// json.NewEncoder(w).Encode(res)
+		vehicle.ID = id
+
+		json.NewEncoder(w).Encode(vehicle)
 		return
 	}
 }
