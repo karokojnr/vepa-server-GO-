@@ -511,6 +511,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	// var payment model.Payment
 	// if resultCode == 0 {
 	var paymenModel model.Vehicle
+	_ = json.NewDecoder(r.Body).Decode(&paymenModel)
 	paymentUpdate := bson.M{"$set": bson.M{"resultCode": resultCode,
 		"resultDesc":   rBody,
 		"isSuccessful": true,
