@@ -306,6 +306,8 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm() // Parses the request body
 	vehicleid := r.Form.Get("id")
 	id, _ := primitive.ObjectIDFromHex(vehicleid)
+	log.Println("vehicle id")
+	log.Println(id)
 
 	var vehicle model.Vehicle
 	var res model.ResponseResult
