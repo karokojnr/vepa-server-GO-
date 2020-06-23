@@ -307,9 +307,6 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 	//Get id from parameters
 	vehicleid := params["id"]	
 	id, _ := primitive.ObjectIDFromHex(vehicleid)
-	log.Println("id")
-	log.Println(id)
-
 	var vehicle model.Vehicle
 	var res model.ResponseResult
 	body, _ := ioutil.ReadAll(r.Body)
@@ -323,26 +320,24 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 	if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		//Use vehicle Id
 		// _ = claims["id"].(string)
-		findVeehicleFilter := bson.M{"_id": id}
-		log.Println("Find vehicle")
-		log.Println(findVeehicleFilter) 
-		var resultvshicle model.Vehicle
-		err := collection.FindOne(context.TODO(), findVeehicleFilter).Decode(&resultvshicle)
-		if err != nil {
-			// log.Println("Vehicle not found")
-			res.Error = "Vehicle not found"
-		json.NewEncoder(w).Encode(res)
-			return
-		}
+		// findVeehicleFilter := bson.M{"_id": id}
+		// log.Println("Find vehicle")
+		// log.Println(findVeehicleFilter) 
+		// var resultvshicle model.Vehicle
+		// err := collection.FindOne(context.TODO(), findVeehicleFilter).Decode(&resultvshicle)
+		// if err != nil {
+		// 	// log.Println("Vehicle not found")
+		// 	res.Error = "Vehicle not found"
+		// json.NewEncoder(w).Encode(res)
+		// 	return
+		// }
 		filter := bson.M{"_id": id}
-		log.Println("filter")
-		log.Println(filter)
 		log.Println(vehicle.RegistrationNumber)
 		// Read update model from body request
 		// _ = json.NewDecoder(r.Body).Decode(&user)
 		update := bson.M{"$set": bson.M{
 			"registrationNumber": vehicle.RegistrationNumber,
-			// "vehicleClass":       vehicle.UserID,
+			"vehicleClass":       vehicle.UserID,
 		}}
 		log.Println(update)
 		// var result model.Vehicle
