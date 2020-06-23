@@ -180,8 +180,6 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 		id := claims["id"].(string)
 		userID, _ := primitive.ObjectIDFromHex(id)
 		filter := bson.M{"userId": userID}
-		// Read update model from body request
-		// _ = json.NewDecoder(r.Body).Decode(&user)
 		update := bson.M{"$set": bson.M{
 			"firstName":   user.Firstname,
 			"lastName":    user.Lastname,
@@ -226,10 +224,6 @@ func FCMTokenHandler(w http.ResponseWriter, r *http.Request) {
 		id := claims["id"].(string)
 		userID, _ := primitive.ObjectIDFromHex(id)
 		filter := bson.M{"_id": userID}
-		// Read update model from body request
-		// _ = json.NewDecoder(r.Body).Decode(&user)
-		log.Println("fcmtoken")
-		log.Println(user.FCMToken)
 		update := bson.M{"$set": bson.M{"fcmtoken": user.FCMToken}}
 		_, err := collection.UpdateOne(context.TODO(), filter, update)
 		if err != nil {
@@ -318,28 +312,15 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		//Use vehicle Id
+		//Use user Id
 		// _ = claims["id"].(string)
-		// findVeehicleFilter := bson.M{"_id": id}
-		// log.Println("Find vehicle")
-		// log.Println(findVeehicleFilter)
-		// var resultvshicle model.Vehicle
-		// err := collection.FindOne(context.TODO(), findVeehicleFilter).Decode(&resultvshicle)
-		// if err != nil {
-		// 	// log.Println("Vehicle not found")
-		// 	res.Error = "Vehicle not found"
-		// json.NewEncoder(w).Encode(res)
-		// 	return
-		// }
 		filter := bson.M{"_id": id}
-		// log.Println(vehicle.RegistrationNumber)
 		// Read update model from body request
 		_ = json.NewDecoder(r.Body).Decode(&vehicle)
 		update := bson.M{"$set": bson.M{
 			"registrationNumber": vehicle.RegistrationNumber,
 			"vehicleClass":       vehicle.VehicleClass,
 		}}
-		log.Println(update)
 		var result model.Vehicle
 		err := collection.FindOneAndUpdate(context.TODO(), filter, update).Decode(&result)
 		if err != nil {
