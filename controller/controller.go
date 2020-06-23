@@ -305,7 +305,8 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 	})
 	var params = mux.Vars(r)
 	//Get id from parameters
-	id, _ := params["id"]
+	vehicleid := params["id"]	
+	id, _ := primitive.ObjectIDFromHex(vehicleid)
 	log.Println("id")
 	log.Println(id)
 
@@ -313,17 +314,15 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 	var res model.ResponseResult
 	body, _ := ioutil.ReadAll(r.Body)
 	err = json.Unmarshal(body, &vehicle)
-	// Read update model from body request
-	// _ = json.NewDecoder(r.Body).Decode(&vehicle)
 	collection, err := db.GetVehicleCollection()
 	if err != nil {
 		res.Error = err.Error()
 		json.NewEncoder(w).Encode(res)
 		return
 	}
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+	if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		//Use vehicle Id
-		_ = claims["id"].(string)
+		// _ = claims["id"].(string)
 		err := collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&vehicle)
 		if err != nil {
 			log.Println("Vehicle not found")
