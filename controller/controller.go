@@ -309,8 +309,8 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 	id, _ := primitive.ObjectIDFromHex(vehicleid)
 	var vehicle model.Vehicle
 	var res model.ResponseResult
-	body, _ := ioutil.ReadAll(r.Body)
-	err = json.Unmarshal(body, &vehicle)
+	// body, _ := ioutil.ReadAll(r.Body)
+	// err = json.Unmarshal(body, &vehicle)
 	collection, err := db.GetVehicleCollection()
 	if err != nil {
 		res.Error = err.Error()
@@ -334,7 +334,7 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 		filter := bson.M{"_id": id}
 		log.Println(vehicle.RegistrationNumber)
 		// Read update model from body request
-		// _ = json.NewDecoder(r.Body).Decode(&user)
+		_ = json.NewDecoder(r.Body).Decode(&vehicle)
 		update := bson.M{"$set": bson.M{
 			"registrationNumber": vehicle.RegistrationNumber,
 			"vehicleClass":       vehicle.UserID,
