@@ -4,6 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"vepa/model"
+	"vepa/util/db"
+
 	"github.com/AndroidStudyOpenSource/mpesa-api-go"
 	"github.com/appleboy/go-fcm"
 	jwt "github.com/dgrijalva/jwt-go"
@@ -11,11 +17,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
-	"io/ioutil"
-	"log"
-	"net/http"
-	"vepa/model"
-	"vepa/util/db"
 )
 
 // RegisterHandler is...
@@ -324,6 +325,7 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 		filter := bson.M{"_id": id}
 		log.Println("filter")
 		log.Println(filter)
+		log.Println(vehicle.RegistrationNumber)
 		// Read update model from body request
 		// _ = json.NewDecoder(r.Body).Decode(&user)
 		update := bson.M{"$set": bson.M{
@@ -331,7 +333,7 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 			// "vehicleClass":       vehicle.UserID,
 		}}
 		// var result model.Vehicle
-		_,err := collection.UpdateOne(context.TODO(), filter, update)
+		_, err := collection.UpdateOne(context.TODO(), filter, update)
 		if err != nil {
 			fmt.Printf("Could not update!")
 			return
