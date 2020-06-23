@@ -424,7 +424,7 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(res)
 			return
 		}
-		log.Println("Payment ID")
+		fmt.Println("Payment ID")
 		log.Println(payment.PaymentID)
 		res.Result = "Payment Added Successfully"
 		json.NewEncoder(w).Encode(res)
