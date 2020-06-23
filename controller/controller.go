@@ -7,7 +7,7 @@ import (
 	"github.com/AndroidStudyOpenSource/mpesa-api-go"
 	"github.com/appleboy/go-fcm"
 	jwt "github.com/dgrijalva/jwt-go"
-	// "github.com/gorilla/mux"
+	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
@@ -300,15 +300,15 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return []byte("secret"), nil
 	})
-	// var params = mux.Vars(r)
-	// //Get id from parameters
-	// id, _ := primitive.ObjectIDFromHex(params["id"])
-	r.ParseForm() // Parses the request body
-	vehicleid := r.Form.Get("id")
-	log.Println("vehicle id")
-	log.Println(vehicleid)
+	var params = mux.Vars(r)
+	//Get id from parameters
+	id, _ := primitive.ObjectIDFromHex(params["id"])
+	// r.ParseForm() // Parses the request body
+	// vehicleid := r.Form.Get("id")
+	// log.Println("vehicle id")
+	// log.Println(vehicleid)
 
-	id, _ := primitive.ObjectIDFromHex(vehicleid)
+	// id, _ := primitive.ObjectIDFromHex(vehicleid)
 	log.Println("id")
 	log.Println(id)
 
