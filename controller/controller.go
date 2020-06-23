@@ -330,13 +330,14 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 			"registrationNumber": vehicle.RegistrationNumber,
 			"vehicleClass":       vehicle.UserID,
 		}}
-		var result model.Vehicle
-		err := collection.FindOneAndUpdate(context.TODO(), filter, update).Decode(&result)
+		// var result model.Vehicle
+		err := collection.FindOneAndUpdate(context.TODO(), filter, update).Decode(&vehicle)
 		if err != nil {
 			fmt.Printf("Could not update!")
 			return
 
 		}
+		log.Println("Past could not update!")
 		// res.Result = "Vehicle updated successfully"
 		// json.NewEncoder(w).Encode(res)
 		vehicle.ID = id
