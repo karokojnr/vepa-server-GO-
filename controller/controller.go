@@ -332,7 +332,7 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 		// 	return
 		// }
 		filter := bson.M{"_id": id}
-		log.Println(vehicle.RegistrationNumber)
+		// log.Println(vehicle.RegistrationNumber)
 		// Read update model from body request
 		_ = json.NewDecoder(r.Body).Decode(&vehicle)
 		update := bson.M{"$set": bson.M{
@@ -342,7 +342,6 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println(update)
 		var result model.Vehicle
 		err := collection.FindOneAndUpdate(context.TODO(), filter, update).Decode(&result)
-
 		if err != nil {
 			res.Error = "Unsuccessful!"
 			json.NewEncoder(w).Encode(res)
