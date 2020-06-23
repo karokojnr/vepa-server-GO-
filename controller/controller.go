@@ -308,10 +308,10 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 
 	var vehicle model.Vehicle
 	var res model.ResponseResult
-	// body, _ := ioutil.ReadAll(r.Body)
-	// err = json.Unmarshal(body, &vehicle)
+	body, _ := ioutil.ReadAll(r.Body)
+	err = json.Unmarshal(body, &vehicle)
 	// Read update model from body request
-	_ = json.NewDecoder(r.Body).Decode(&vehicle)
+	// _ = json.NewDecoder(r.Body).Decode(&vehicle)
 	collection, err := db.GetVehicleCollection()
 	if err != nil {
 		res.Error = err.Error()
