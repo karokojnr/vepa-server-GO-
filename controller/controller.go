@@ -512,7 +512,8 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	paymentFilter := bson.M{"_id": paymentID}
+	pid, _ := primitive.ObjectIDFromHex(paymentID)
+	paymentFilter := bson.M{"_id": pid}
 	// var payment model.Payment
 	// if resultCode == 0 {
 	var paymenModel model.Payment
