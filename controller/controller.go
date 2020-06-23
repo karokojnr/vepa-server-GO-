@@ -348,10 +348,13 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 
 			return
 		}
-		log.Println("Past could not update!")
-		res.Result = "Vehicle updated successfully"
+		vehicle.VeicleID = id
+
+	json.NewEncoder(w).Encode(vehicle)
+		// log.Println("Past could not update!")
+		// res.Result = "Vehicle updated successfully"
+		// // json.NewEncoder(w).Encode(res)
 		// json.NewEncoder(w).Encode(res)
-		json.NewEncoder(w).Encode(res)
 		return
 	}
 }
