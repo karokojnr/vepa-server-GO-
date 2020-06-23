@@ -29,17 +29,18 @@ type Vehicle struct {
 
 // Payment is...
 type Payment struct {
-	Days               interface{} `bson:"days" json:"days"`
-	VehicleReg         string      `bson:"vehicleReg" json:"vehicleReg"`
-	Amount             int         `bson:"amount" json:"amount"`
-	MpesaReceiptNumber string      `bson:"mpesaReceiptNumber" json:"mpesaReceiptNumber"`
-	ResultCode         int         `bson:"resultCode" json:"resultCode"`
-	ResultDesc         string      `bson:"resultDesc" json:"resultDesc"`
-	TransactionDate    string      `bson:"transactionDate" json:"transactionDate"`
-	PhoneNumber        string      `bson:"phoneNumber" json:"phoneNumber"`
-	CheckoutRequestID  string      `bson:"checkoutRequestID" json:"checkoutRequestID"`
-	IsSuccessful       bool        `bson:"isSuccessful" json:"isSuccessful"`
-	UserID             string      `bson:"userId" json:"userId"`
+	PaymentID          primitive.ObjectID `bson:"_id" json:"_id,omitempty"`
+	Days               interface{}        `bson:"days" json:"days"`
+	VehicleReg         string             `bson:"vehicleReg" json:"vehicleReg"`
+	Amount             int                `bson:"amount" json:"amount"`
+	MpesaReceiptNumber string             `bson:"mpesaReceiptNumber" json:"mpesaReceiptNumber"`
+	ResultCode         int                `bson:"resultCode" json:"resultCode"`
+	ResultDesc         string             `bson:"resultDesc" json:"resultDesc"`
+	TransactionDate    string             `bson:"transactionDate" json:"transactionDate"`
+	PhoneNumber        string             `bson:"phoneNumber" json:"phoneNumber"`
+	CheckoutRequestID  string             `bson:"checkoutRequestID" json:"checkoutRequestID"`
+	IsSuccessful       bool               `bson:"isSuccessful" json:"isSuccessful"`
+	UserID             string             `bson:"userId" json:"userId"`
 }
 
 // ResponseResult is...

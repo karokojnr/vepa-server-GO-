@@ -415,6 +415,7 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 		userID := claims["id"].(string)
 		payment.UserID = userID
 		payment.IsSuccessful = false
+		payment.PaymentID = primitive.NewObjectID()
 		fmt.Println("Payment Handeler Used ID:")
 		log.Println(userID)
 		_, err = collection.InsertOne(context.TODO(), payment)
@@ -423,6 +424,8 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 			json.NewEncoder(w).Encode(res)
 			return
 		}
+		log.Println("Payment ID")
+		log.Println(payment.PaymentID)
 		res.Result = "Payment Added Successfully"
 		json.NewEncoder(w).Encode(res)
 
