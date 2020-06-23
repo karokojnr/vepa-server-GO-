@@ -326,7 +326,8 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 		findVeehicleFilter := bson.M{"_id": id}
 		log.Println("Find vehicle")
 		log.Println(findVeehicleFilter) 
-		err := collection.FindOne(context.TODO(), findVeehicleFilter).Decode(&vehicle)
+		var resultvshicle model.Vehicle
+		err := collection.FindOne(context.TODO(), findVeehicleFilter).Decode(&resultvshicle)
 		if err != nil {
 			log.Println("Vehicle not found")
 			return
