@@ -303,7 +303,7 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 	//Get id from parameters
 	id, _ := primitive.ObjectIDFromHex(params["id"])
 
-	
+
 	var vehicle model.Vehicle
 	var res model.ResponseResult
 	body, _ := ioutil.ReadAll(r.Body)
@@ -319,7 +319,7 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 		userid := claims["id"].(string)
 		_, _ = primitive.ObjectIDFromHex(userid)
 		
-		filter := bson.M{"userId": id}
+		filter := bson.M{"_id": id}
 		// Read update model from body request
 		// _ = json.NewDecoder(r.Body).Decode(&user)
 		update := bson.M{"$set": bson.M{
