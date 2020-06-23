@@ -507,14 +507,14 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 
 
 
-	fmt.Println("mpesa receipt number:")
-	fmt.Println(mpesaReceiptNumber)
+	log.Println("mpesa receipt number:")
+	log.Println(mpesaReceiptNumber)
 	log.Println("resultCode:")
 	log.Println(resultCode)
 	log.Println("resultDesc:")
 	log.Println(rBody)
-	log.Println("mpesa receipt number:")
-	log.Println(mpesaReceiptNumber)
+	// log.Println("mpesa receipt number:")
+	// log.Println(mpesaReceiptNumber)
 	paymentCollection, err := db.GetPaymentCollection()
 	if err != nil {
 		log.Fatal(err)
