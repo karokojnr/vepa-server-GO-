@@ -30,7 +30,7 @@ type Vehicle struct {
 // Payment is...
 type Payment struct {
 	PaymentID          primitive.ObjectID `bson:"_id" json:"_id,omitempty"`
-	Days               float32            `bson:"days" json:"days"`
+	Days               string            `bson:"days" json:"days"`
 	VehicleReg         string             `bson:"vehicleReg" json:"vehicleReg"`
 	Amount             int                `bson:"amount" json:"amount"`
 	MpesaReceiptNumber string             `bson:"mpesaReceiptNumber" json:"mpesaReceiptNumber"`
