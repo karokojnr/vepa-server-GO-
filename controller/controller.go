@@ -503,11 +503,11 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	resultCode := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["ResultCode"]
 	rBody := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["ResultDesc"]
-	mpesaReceiptNumber := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["CallbackMetadata"].(map[string]interface{})["Item"].(map[string]string)["Value"]
-	// (map[string]map[string]interface{})["MpesaReceiptNumber"]
+	item := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["CallbackMetadata"].(map[string]interface{})["Item"]
+	//TODO: get mpesa receipt number ["MpesaReceiptNumber"]
 
 	log.Println("Mpesa Receipt Number:")
-	log.Println(mpesaReceiptNumber)
+	log.Println(item)
 	log.Println("resultCode:")
 	log.Println(resultCode)
 	log.Println("resultDesc:")
