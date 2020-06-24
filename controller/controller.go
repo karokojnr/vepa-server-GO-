@@ -511,13 +511,19 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	checkoutRequestID := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["CheckoutRequestID"]
 	log.Println("MpesaReceiptNumber:")
 	log.Println(mpesaReceiptNumber)
-
-	log.Println("Item:")
-	log.Println(item)
 	log.Println("resultCode:")
 	log.Println(resultCode)
 	log.Println("resultDesc:")
 	log.Println(rBody)
+	log.Println("transaction date:")
+	log.Println(transactionDate)
+	log.Println("phone number:")
+	log.Println(phoneNumber)
+	log.Println("checkoutRequestID:")
+	log.Println(checkoutRequestID)
+	log.Println("Item:")
+	log.Println(item)
+	
 	// log.Println("mpesa receipt number:")
 	// log.Println(mpesaReceiptNumber)
 	paymentCollection, err := db.GetPaymentCollection()
@@ -532,12 +538,14 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Payment ID")
 	log.Println(paymentID)
 	_ = json.NewDecoder(r.Body).Decode(&paymenModel)
-	paymentUpdate := bson.M{"$set": bson.M{"resultCode": resultCode,
-		"resultDesc":   rBody,
-		"transactionDate": transactionDate,
-		"phoneNumber": phoneNumber,
-		"checkoutRequestID": checkoutRequestID,
-		"isSuccessful": true,
+	paymentUpdate := bson.M{"$set": bson.M{
+		"mpesaReceiptNumber": mpesaReceiptNumber,
+		"resultCode":         resultCode,
+		"resultDesc":         rBody,
+		"transactionDate":    transactionDate,
+		"phoneNumber":        phoneNumber,
+		"checkoutRequestID":  checkoutRequestID,
+		"isSuccessful":       true,
 	}}
 	log.Println("payment update")
 	log.Println(paymentUpdate)
