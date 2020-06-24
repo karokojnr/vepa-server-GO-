@@ -576,6 +576,10 @@ func UserPaymentsHandler(w http.ResponseWriter, r *http.Request) {
 	})
 	var res model.ResponseResult
 	var results []*model.Payment
+	errr := json.Unmarshal([]byte(s), &results)
+	if errr != nil {
+		log.Println("Unmarshall error")
+	}
 	collection, err := db.GetPaymentCollection()
 	if err != nil {
 		res.Error = "Error, Try Again Later"
