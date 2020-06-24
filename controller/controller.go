@@ -523,7 +523,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println(checkoutRequestID)
 	log.Println("Item:")
 	log.Println(item)
-	
+
 	// log.Println("mpesa receipt number:")
 	// log.Println(mpesaReceiptNumber)
 	paymentCollection, err := db.GetPaymentCollection()
@@ -538,28 +538,29 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Payment ID")
 	log.Println(paymentID)
 	_ = json.NewDecoder(r.Body).Decode(&paymenModel)
-	paymentUpdate := bson.M{"$set": bson.M{
-		"mpesaReceiptNumber": mpesaReceiptNumber,
-		"resultCode":         resultCode,
-		"resultDesc":         rBody,
-		"transactionDate":    transactionDate,
-		"phoneNumber":        phoneNumber,
-		"checkoutRequestID":  checkoutRequestID,
-		"isSuccessful":       true,
-	}}
-	log.Println("payment update")
-	log.Println(paymentUpdate)
-	errp := paymentCollection.FindOneAndUpdate(context.TODO(), paymentFilter, paymentUpdate).Decode(&paymenModel)
-	if errp != nil {
-		fmt.Printf("error...")
-		return
+	if resultCode == 0 {
+		paymentUpdate := bson.M{"$set": bson.M{
+			"mpesaReceiptNumber": mpesaReceiptNumber,
+			"resultCode":         resultCode,
+			"resultDesc":         rBody,
+			"transactionDate":    transactionDate,
+			"phoneNumber":        phoneNumber,
+			"checkoutRequestID":  checkoutRequestID,
+			"isSuccessful":       true,
+		}}
+		log.Println("payment update")
+		log.Println(paymentUpdate)
+		errp := paymentCollection.FindOneAndUpdate(context.TODO(), paymentFilter, paymentUpdate).Decode(&paymenModel)
+		if errp != nil {
+			fmt.Printf("error...")
+			return
 
+		}
+		// log.Println(p)
+		res.Result = "Payment updated"
+		json.NewEncoder(w).Encode(res)
+		// return
 	}
-	// log.Println(p)
-	res.Result = "Payment updated"
-	json.NewEncoder(w).Encode(res)
-	// return
-
 	// }
 
 	//Send message...
