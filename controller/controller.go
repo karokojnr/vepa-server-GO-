@@ -477,8 +477,6 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"])
-	// fmt.Println(bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["ResultDesc"])
 	var res model.ResponseResult
 	collection, err := db.GetUserCollection()
 	if err != nil {
@@ -503,67 +501,10 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	resultCode := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["ResultCode"]
 	rBody := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["ResultDesc"]
 	item := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["CallbackMetadata"].(map[string]interface{})["Item"]
-	//TODO: get mpesa receipt number ["MpesaReceiptNumber"]
 	mpesaReceiptNumber := item.([]interface{})[1].(map[string]interface{})["Value"]
 	transactionDate := item.([]interface{})[3].(map[string]interface{})["Value"]
 	phoneNumber := item.([]interface{})[4].(map[string]interface{})["Value"]
 	checkoutRequestID := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["CheckoutRequestID"]
-	log.Println("MpesaReceiptNumber:")
-	log.Println(mpesaReceiptNumber)
-	log.Println("resultCode:")
-	log.Println(resultCode)
-	log.Println("resultDesc:")
-	log.Println(rBody)
-	log.Println("transaction date:")
-	log.Println(transactionDate)
-	log.Println("phone number:")
-	log.Println(phoneNumber)
-	log.Println("checkoutRequestID:")
-	log.Println(checkoutRequestID)
-	log.Println("Item:")
-	log.Println(item)
-
-	// log.Println("mpesa receipt number:")
-	// log.Println(mpesaReceiptNumber)
-	paymentCollection, err := db.GetPaymentCollection()
-	if err != nil {
-		log.Fatal(err)
-	}
-	pid, _ := primitive.ObjectIDFromHex(paymentID)
-	paymentFilter := bson.M{"_id": pid}
-	// var payment model.Payment
-	// if resultCode == 0 {
-	var paymenModel model.Payment
-	fmt.Println("Payment ID")
-	log.Println(paymentID)
-	_ = json.NewDecoder(r.Body).Decode(&paymenModel)
-	if resultCode != 0 {
-		paymenModel.IsSuccessful = false
-	}
-		paymentUpdate := bson.M{"$set": bson.M{
-			"mpesaReceiptNumber": mpesaReceiptNumber,
-			"resultCode":         resultCode,
-			"resultDesc":         rBody,
-			"transactionDate":    transactionDate,
-			"phoneNumber":        phoneNumber,
-			"checkoutRequestID":  checkoutRequestID,
-			"isSuccessful":       true,
-		}}
-		log.Println("payment update")
-		log.Println(paymentUpdate)
-	
-	errp := paymentCollection.FindOneAndUpdate(context.TODO(), paymentFilter, paymentUpdate).Decode(&paymenModel)
-	if errp != nil {
-		fmt.Printf("error...")
-		return
-
-	}
-	// log.Println(p)
-	res.Result = "Payment updated"
-	json.NewEncoder(w).Encode(res)
-	// return
-	
-	// }
 
 	//Send message...
 	msg := &fcm.Message{
@@ -584,9 +525,42 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatalln(err)
 	}
 	log.Printf("%#v\n", response)
+
+	paymentCollection, err := db.GetPaymentCollection()
+	if err != nil {
+		log.Fatal(err)
+	}
+	pid, _ := primitive.ObjectIDFromHex(paymentID)
+	paymentFilter := bson.M{"_id": pid}
+	var paymenModel model.Payment
+	fmt.Println("Payment ID")
+	log.Println(paymentID)
+	_ = json.NewDecoder(r.Body).Decode(&paymenModel)
+	if resultCode != 0 {
+		paymenModel.IsSuccessful = false
+	}
+	paymentUpdate := bson.M{"$set": bson.M{
+		"mpesaReceiptNumber": mpesaReceiptNumber,
+		"resultCode":         resultCode,
+		"resultDesc":         rBody,
+		"transactionDate":    transactionDate,
+		"phoneNumber":        phoneNumber,
+		"checkoutRequestID":  checkoutRequestID,
+		"isSuccessful":       true,
+	}}
+	errp := paymentCollection.FindOneAndUpdate(context.TODO(), paymentFilter, paymentUpdate).Decode(&paymenModel)
+	if errp != nil {
+		fmt.Printf("error...")
+		return
+
+	}
+	res.Result = "Payment updated"
+	json.NewEncoder(w).Encode(res)
+
 	return
 
 }
+
 // UserPaymentsHandler is...
 func UserPaymentsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-TYpe", "application/json")
