@@ -415,6 +415,7 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 		payment.UserID = userID
 		payment.IsSuccessful = false
 		payment.PaymentID = primitive.NewObjectID()
+
 		fmt.Println("Payment Handeler Used ID:")
 		log.Println(userID)
 		_, err = collection.InsertOne(context.TODO(), payment)
@@ -428,6 +429,7 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 
 		res.Result = "Payment Added Successfully"
 		json.NewEncoder(w).Encode(res)
+		pID := payment.PaymentID.Hex()
 
 		const (
 			appKey    = "WRnVsZ32lzmgQOVAoiANPAB9se2RYrB2"
@@ -447,7 +449,7 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 			PartyA:            "254799338805",
 			PartyB:            "174379",
 			PhoneNumber:       "254799338805",
-			CallBackURL:       "https://vepa-server-go.herokuapp.com/rcb?id=" + userID + "&paymentid=" + payment.PaymentID.Hex(),
+			CallBackURL:       "https://vepa-5c657.ew.r.appspot.com/rcb?id=" + userID + "&paymentid=" + pID,
 			AccountReference:  "Vepa",
 			TransactionDesc:   "Vepa Payment",
 		})
@@ -595,6 +597,7 @@ func UserPaymentsHandler(w http.ResponseWriter, r *http.Request) {
 				log.Fatal(err)
 			}
 			results = append(results, &elem)
+
 		}
 		if err := cur.Err(); err != nil {
 			log.Fatal(err)

@@ -2,6 +2,7 @@ package model
 
 import (
 	// "go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -30,7 +31,7 @@ type Vehicle struct {
 // Payment is...
 type Payment struct {
 	PaymentID          primitive.ObjectID `bson:"_id" json:"_id,omitempty"`
-	Days               string            `bson:"days" json:"days"`
+	Days               bson.A            `bson:"days" json:"days"`
 	VehicleReg         string             `bson:"vehicleReg" json:"vehicleReg"`
 	Amount             int                `bson:"amount" json:"amount"`
 	MpesaReceiptNumber string             `bson:"mpesaReceiptNumber" json:"mpesaReceiptNumber"`
