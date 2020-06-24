@@ -506,6 +506,9 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	item := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["CallbackMetadata"].(map[string]interface{})["Item"]
 	//TODO: get mpesa receipt number ["MpesaReceiptNumber"]
 	mpesaReceiptNumber := item.([]interface{})[1].(map[string]interface{})["Value"]
+	transactionDate := item.([]interface{})[3].(map[string]interface{})["Value"]
+	phoneNumber := item.([]interface{})[4].(map[string]interface{})["Value"]
+	checkoutRequestID := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["CheckoutRequestID"]
 	log.Println("MpesaReceiptNumber:")
 	log.Println(mpesaReceiptNumber)
 
@@ -531,6 +534,9 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewDecoder(r.Body).Decode(&paymenModel)
 	paymentUpdate := bson.M{"$set": bson.M{"resultCode": resultCode,
 		"resultDesc":   rBody,
+		"transactionDate": transactionDate,
+		"phoneNumber": phoneNumber,
+		"checkoutRequestID": checkoutRequestID,
 		"isSuccessful": true,
 	}}
 	log.Println("payment update")
