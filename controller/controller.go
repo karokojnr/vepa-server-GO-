@@ -379,7 +379,6 @@ func UserVehiclesHandler(w http.ResponseWriter, r *http.Request) {
 			log.Fatal(err)
 		}
 		cur.Close(context.TODO())
-		fmt.Printf("Found multiple documents (array of pointers ): %+v\n", results)
 		json.NewEncoder(w).Encode(results)
 		return
 	}
@@ -627,7 +626,6 @@ func UserPaymentsHandler(w http.ResponseWriter, r *http.Request) {
 			log.Fatal(err)
 		}
 		cur.Close(context.TODO())
-		fmt.Printf("Found multiple documents (array of pointers ): %+v\n", results)
 		json.NewEncoder(w).Encode(results)
 		return
 	}
