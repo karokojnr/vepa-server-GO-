@@ -21,6 +21,7 @@ func main() {
 	r.HandleFunc("/token", controller.FCMTokenHandler).Methods("PUT")
 	r.HandleFunc("/profile", controller.ProfileHandler).Methods("GET")
 	r.HandleFunc("/userVehicles", controller.UserVehiclesHandler).Methods("GET")
+	r.HandleFunc("/userPayments", controller.UserPaymentsHandler).Methods("GET")
 	log.Fatal(http.ListenAndServe(GetPort(), r))
 }
 
