@@ -541,18 +541,18 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	if resultCode != 0 {
 		paymenModel.IsSuccessful = false
 	}
-	paymentUpdate := bson.M{"$set": bson.M{
-		"mpesaReceiptNumber": mpesaReceiptNumber,
-		"resultCode":         resultCode,
-		"resultDesc":         rBody,
-		"transactionDate":    transactionDate,
-		"phoneNumber":        phoneNumber,
-		"checkoutRequestID":  checkoutRequestID,
-		"isSuccessful":       true,
-	}}
-	log.Println("payment update")
-	log.Println(paymentUpdate)
-
+		paymentUpdate := bson.M{"$set": bson.M{
+			"mpesaReceiptNumber": mpesaReceiptNumber,
+			"resultCode":         resultCode,
+			"resultDesc":         rBody,
+			"transactionDate":    transactionDate,
+			"phoneNumber":        phoneNumber,
+			"checkoutRequestID":  checkoutRequestID,
+			"isSuccessful":       true,
+		}}
+		log.Println("payment update")
+		log.Println(paymentUpdate)
+	
 	errp := paymentCollection.FindOneAndUpdate(context.TODO(), paymentFilter, paymentUpdate).Decode(&paymenModel)
 	if errp != nil {
 		fmt.Printf("error...")
@@ -563,7 +563,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	res.Result = "Payment updated"
 	json.NewEncoder(w).Encode(res)
 	// return
-
+	
 	// }
 
 	//Send message...
@@ -587,4 +587,51 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("%#v\n", response)
 	return
 
+}
+// UserPaymentsHandler is...
+func UserPaymentsHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-TYpe", "application/json")
+	tokenString := r.Header.Get("Authorization")
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		// Don't forget to validate the alg is what you expect:
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method")
+		}
+		return []byte("secret"), nil
+	})
+	var res model.ResponseResult
+	var results []*model.Payment
+	collection, err := db.GetPaymentCollection()
+	if err != nil {
+		res.Error = "Error, Try Again Later"
+		json.NewEncoder(w).Encode(res)
+		return
+	}
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		userID := claims["id"].(string)
+		// userID, _ := primitive.ObjectIDFromHex(id)
+		filter := bson.M{"userId": userID}
+		cur, err := collection.Find(context.TODO(), filter)
+		if err != nil {
+			log.Fatal(err)
+		}
+		for cur.Next(context.TODO()) {
+			var elem model.Payment
+			err := cur.Decode(&elem)
+			if err != nil {
+				log.Fatal(err)
+			}
+			results = append(results, &elem)
+		}
+		if err := cur.Err(); err != nil {
+			log.Fatal(err)
+		}
+		cur.Close(context.TODO())
+		fmt.Printf("Found multiple documents (array of pointers ): %+v\n", results)
+		json.NewEncoder(w).Encode(results)
+		return
+	}
+	res.Error = err.Error()
+	json.NewEncoder(w).Encode(res)
+	return
 }
