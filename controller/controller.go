@@ -508,26 +508,6 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	phoneNumber := item.([]interface{})[4].(map[string]interface{})["Value"]
 	checkoutRequestID := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["CheckoutRequestID"]
 
-	//Send message...
-	msg := &fcm.Message{
-		To: result.FCMToken,
-		Data: map[string]interface{}{
-			"title": "Vepa",
-			"body":  rBody,
-		},
-	}
-	// Create a FCM client to send the message.
-	client, err := fcm.NewClient("AAAACkklGVY:APA91bEGEFuh7dji5CJKRFz2ih4T8s2We4n3m1mvcnaW3_JoBs9hvkVxMm4ObsG3_MayGAuTnXh9ZoiwYJIN4tepf6xARJxFhOJimzwdEbSfLvhuGZO9FFpaYC5PS5b8SvdAeqscPiXQ")
-	if err != nil {
-		log.Fatalln(err)
-	}
-	// Send the message and receive the response without retries.
-	response, err := client.Send(msg)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	log.Printf("%#v\n", response)
-
 	paymentCollection, err := db.GetPaymentCollection()
 	if err != nil {
 		log.Fatal(err)
@@ -558,6 +538,26 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	res.Result = "Payment updated"
 	json.NewEncoder(w).Encode(res)
+
+	//Send message...
+	msg := &fcm.Message{
+		To: result.FCMToken,
+		Data: map[string]interface{}{
+			"title": "Vepa",
+			"body":  rBody,
+		},
+	}
+	// Create a FCM client to send the message.
+	client, err := fcm.NewClient("AAAACkklGVY:APA91bEGEFuh7dji5CJKRFz2ih4T8s2We4n3m1mvcnaW3_JoBs9hvkVxMm4ObsG3_MayGAuTnXh9ZoiwYJIN4tepf6xARJxFhOJimzwdEbSfLvhuGZO9FFpaYC5PS5b8SvdAeqscPiXQ")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	// Send the message and receive the response without retries.
+	response, err := client.Send(msg)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	log.Printf("%#v\n", response)
 
 	return
 
