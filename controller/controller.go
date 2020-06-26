@@ -87,7 +87,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 			result.Exp = exp
 
 			res.Result = "Registration Successful"
-			json.NewEncoder(w).Encode(res)
+			json.NewEncoder(w).Encode(result)
 			return
 		}
 
