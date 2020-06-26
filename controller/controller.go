@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	// "reflect"
 	"vepa/model"
 	"vepa/util/db"
 	"vepa/util/env"
@@ -467,7 +468,7 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 			panic(err)
 		}
 
-		res, err := svc.Simulation(mpesa.Express{
+		mres, err := svc.Simulation(mpesa.Express{
 			BusinessShortCode: "174379",
 			Password:          env.GoDotEnvVariable("MPESA_PASSWORD"),
 			Timestamp:         "20200421175555",
@@ -484,7 +485,60 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Println("err")
 		}
-		log.Println(res)
+		var mresMap map[string]interface{}
+		errm := json.Unmarshal([]byte(mres), &mresMap)
+
+		if errm != nil {
+			panic(err)
+		}
+		rCode := mresMap["ResponseCode"]
+		rMessage := mresMap["ResponseDescription"]
+		cMessage := mresMap["CustomerMessage"]
+		log.Println("rMessage")
+		log.Println(rMessage)
+		log.Println("customer message")
+		log.Println(cMessage)
+		// Send error message if error
+		if rCode != 0 {
+			fmt.Println("rCode is not equal to 0")
+			//Send message...
+			id, _ := primitive.ObjectIDFromHex(userID)
+			filter := bson.M{"_id": id}
+
+			var rUser model.User
+			err = collection.FindOne(context.TODO(), filter).Decode(&rUser)
+			if err != nil {
+				if err.Error() == "mongo: no documents in result" {
+					res.Result = "Something went wrong, Please try again later!"
+					json.NewEncoder(w).Encode(res)
+					return
+				}
+			}
+			log.Println("rUser fcm toke")
+			log.Println(rUser.FCMToken)
+			msg := &fcm.Message{
+				To: rUser.FCMToken,
+				Data: map[string]interface{}{
+					"title": "Vepa",
+					"body":  rMessage,
+				},
+			}
+			// Create a FCM client to send the message.
+			client, err := fcm.NewClient(env.GoDotEnvVariable("FCM_SERVER_KEY"))
+			if err != nil {
+				log.Fatalln(err)
+			}
+			// Send the message and receive the response without retries.
+			response, err := client.Send(msg)
+			if err != nil {
+				log.Fatalln(err)
+			}
+			log.Println("Rcode not zero")
+			log.Printf("%#v\n", response)
+			return
+		}
+
+		log.Println(mres)
 		return
 	}
 	res.Error = err.Error()
@@ -528,13 +582,22 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	log.Println(bd)
 	resultCode := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["ResultCode"]
 	rBody := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["ResultDesc"]
-	item := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["CallbackMetadata"].(map[string]interface{})["Item"]
-	mpesaReceiptNumber := item.([]interface{})[1].(map[string]interface{})["Value"]
-	transactionDate := item.([]interface{})[3].(map[string]interface{})["Value"]
-	phoneNumber := item.([]interface{})[4].(map[string]interface{})["Value"]
+	var item interface{}
+	var mpesaReceiptNumber interface{}
+	var transactionDate interface{}
+	var phoneNumber interface{}
+
 	checkoutRequestID := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["CheckoutRequestID"]
+
+	if resultCode == 0 {
+		item = bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["CallbackMetadata"].(map[string]interface{})["Item"]
+		mpesaReceiptNumber = item.([]interface{})[1].(map[string]interface{})["Value"]
+		transactionDate = item.([]interface{})[3].(map[string]interface{})["Value"]
+		phoneNumber = item.([]interface{})[4].(map[string]interface{})["Value"]
+	}
 
 	paymentCollection, err := db.GetPaymentCollection()
 	if err != nil {
