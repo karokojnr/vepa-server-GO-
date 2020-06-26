@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"vepa/model"
 	"vepa/util/db"
+	"vepa/util/env"
 
 	"github.com/AndroidStudyOpenSource/mpesa-api-go"
 	"github.com/appleboy/go-fcm"
@@ -457,9 +458,9 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(res)
 		pID := payment.PaymentID.Hex()
 
-		const (
-			appKey    = "WRnVsZ32lzmgQOVAoiANPAB9se2RYrB2"
-			appSecret = "ixv4HzhalH1fL9ry"
+		var (
+			appKey    = env.GoDotEnvVariable("MPESA_APP_KEY")
+			appSecret = env.GoDotEnvVariable("MPESA_APP_SECRET")
 		)
 		svc, err := mpesa.New(appKey, appSecret, mpesa.SANDBOX)
 		if err != nil {
@@ -468,7 +469,7 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 
 		res, err := svc.Simulation(mpesa.Express{
 			BusinessShortCode: "174379",
-			Password:          "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjAwNDIxMTc1NTU1",
+			Password:          env.GoDotEnvVariable("MPESA_PASSWORD"),
 			Timestamp:         "20200421175555",
 			TransactionType:   "CustomerPayBillOnline",
 			Amount:            1,
@@ -575,7 +576,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 	// Create a FCM client to send the message.
-	client, err := fcm.NewClient("AAAACkklGVY:APA91bEGEFuh7dji5CJKRFz2ih4T8s2We4n3m1mvcnaW3_JoBs9hvkVxMm4ObsG3_MayGAuTnXh9ZoiwYJIN4tepf6xARJxFhOJimzwdEbSfLvhuGZO9FFpaYC5PS5b8SvdAeqscPiXQ")
+	client, err := fcm.NewClient(env.GoDotEnvVariable("FCM_SERVER_KEY"))
 	if err != nil {
 		log.Fatalln(err)
 	}
