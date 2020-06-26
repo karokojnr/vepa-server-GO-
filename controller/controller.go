@@ -494,13 +494,9 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 		rCode := mresMap["ResponseCode"]
 		rMessage := mresMap["ResponseDescription"]
 		cMessage := mresMap["CustomerMessage"]
-		log.Println("rMessage")
-		log.Println(rMessage)
-		log.Println("customer message")
 		log.Println(cMessage)
 		// Send error message if error
 		if rCode != 0 {
-			fmt.Println("rCode is not equal to 0")
 			//Send message...
 			id, _ := primitive.ObjectIDFromHex(userID)
 			filter := bson.M{"_id": id}
@@ -514,8 +510,6 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 			}
-			log.Println("rUser fcm toke")
-			log.Println(rUser.FCMToken)
 			msg := &fcm.Message{
 				To: rUser.FCMToken,
 				Data: map[string]interface{}{
@@ -533,7 +527,6 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				log.Fatalln(err)
 			}
-			log.Println("Rcode not zero")
 			log.Printf("%#v\n", response)
 			return
 		}
@@ -582,7 +575,6 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	log.Println(bd)
 	resultCode := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["ResultCode"]
 	rBody := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["ResultDesc"]
 	var item interface{}
