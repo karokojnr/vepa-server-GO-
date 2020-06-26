@@ -60,6 +60,32 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 				json.NewEncoder(w).Encode(res)
 				return
 			}
+
+			if err != nil {
+				res.Error = "Invalid password"
+				json.NewEncoder(w).Encode(res)
+				return
+			}
+
+			token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+				"id":    result.ID,
+				"email": result.Email,
+			})
+
+			tokenString, err := token.SignedString([]byte("secret"))
+			exp := 60 * 60
+			fmt.Println("Expires in ... seconds: ")
+			fmt.Println(exp)
+			if err != nil {
+				res.Error = "Error while generating token,Try again"
+				json.NewEncoder(w).Encode(res)
+				return
+			}
+
+			result.Token = tokenString
+			result.Password = ""
+			result.Exp = exp
+
 			res.Result = "Registration Successful"
 			json.NewEncoder(w).Encode(res)
 			return
