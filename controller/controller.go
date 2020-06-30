@@ -210,10 +210,14 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return []byte("secret"), nil
 	})
+	var params = mux.Vars(r)
+	//Get id from parameters
+	vehicleid := params["id"]
+	id, _ := primitive.ObjectIDFromHex(vehicleid)
 	var user model.User
 	var res model.ResponseResult
-	body, _ := ioutil.ReadAll(r.Body)
-	err = json.Unmarshal(body, &user)
+	// body, _ := ioutil.ReadAll(r.Body)
+	// err = json.Unmarshal(body, &user)
 	collection, err := db.GetUserCollection()
 	if err != nil {
 		res.Error = err.Error()
@@ -221,12 +225,12 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		id := claims["id"].(string)
-		userID, _ := primitive.ObjectIDFromHex(id)
-		filter := bson.M{"userId": userID}
-		fmt.Println(userID)
-		fmt.Println(filter)
+	if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		// id := claims["id"].(string)
+		// userID, _ := primitive.ObjectIDFromHex(id)
+		filter := bson.M{"userId": id}
+		// fmt.Println(userID)
+		// fmt.Println(filter)
 		// Read update model from body request
 		_ = json.NewDecoder(r.Body).Decode(&user)
 		update := bson.M{"$set": bson.M{
@@ -236,18 +240,20 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 			"idNumber":    user.IDNumber,
 			"phoneNumber": user.PhoneNumber,
 		}}
-		fmt.Println(update)
+		// fmt.Println(update)
 		var result model.User
 		err := collection.FindOneAndUpdate(context.TODO(), filter, update).Decode(&result)
 		if err != nil {
-			fmt.Println("error...")
+			res.Error = "Unsuccessful!"
+			json.NewEncoder(w).Encode(res)
+
 			return
 
 		}
 		fmt.Println("Past error")
-		result.ID = userID;
+		user.ID =  id
 		res.Result = "User updated Successfully"
-		json.NewEncoder(w).Encode(result)
+		json.NewEncoder(w).Encode(user)
 		return
 	}
 }
