@@ -212,8 +212,8 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 	})
 	var user model.User
 	var res model.ResponseResult
-	// body, _ := ioutil.ReadAll(r.Body)
-	// err = json.Unmarshal(body, &user)
+	body, _ := ioutil.ReadAll(r.Body)
+	err = json.Unmarshal(body, &user)
 	collection, err := db.GetUserCollection()
 	if err != nil {
 		res.Error = err.Error()
@@ -223,9 +223,9 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		id := claims["id"].(string)
-		// userID, _ := primitive.ObjectIDFromHex(id)
-		filter := bson.M{"userId": id}
-		fmt.Println(id)
+		userID, _ := primitive.ObjectIDFromHex(id)
+		filter := bson.M{"userId": userID}
+		fmt.Println(userID)
 		fmt.Println(filter)
 		// Read update model from body request
 		_ = json.NewDecoder(r.Body).Decode(&user)
@@ -237,9 +237,9 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 			"phoneNumber": user.PhoneNumber,
 		}}
 		fmt.Println(update)
-		var result model.User
-		erru := collection.FindOneAndUpdate(context.TODO(), filter, update).Decode(&result)
-		if erru != nil {
+		// var result model.User
+		_,err := collection.UpdateOne(context.TODO(), filter, update)
+		if err != nil {
 			fmt.Println("error...")
 			return
 
@@ -247,7 +247,7 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Past error")
 		// user.ID = id;
 		res.Result = "User updated Successfully"
-		json.NewEncoder(w).Encode(user)
+		json.NewEncoder(w).Encode(res)
 		return
 	}
 }
