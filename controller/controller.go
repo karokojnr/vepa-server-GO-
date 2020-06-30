@@ -228,7 +228,7 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 	if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		// id := claims["id"].(string)
 		// userID, _ := primitive.ObjectIDFromHex(id)
-		filter := bson.M{"userId": id}
+		filter := bson.M{"_id": id}
 		// fmt.Println(userID)
 		// fmt.Println(filter)
 		// Read update model from body request
@@ -250,9 +250,9 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 			return
 
 		}
-		fmt.Println("Past error")
+		// fmt.Println("Past error")
 		user.ID =  id
-		res.Result = "User updated Successfully"
+		// res.Result = "User updated Successfully"
 		json.NewEncoder(w).Encode(user)
 		return
 	}
