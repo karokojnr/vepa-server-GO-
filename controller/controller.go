@@ -237,17 +237,17 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 			"phoneNumber": user.PhoneNumber,
 		}}
 		fmt.Println(update)
-		// var result model.User
-		err := collection.FindOneAndUpdate(context.TODO(), filter, update)
+		var result model.User
+		err := collection.FindOneAndUpdate(context.TODO(), filter, update).Decode(&result)
 		if err != nil {
 			fmt.Println("error...")
 			return
 
 		}
 		fmt.Println("Past error")
-		user.ID = userID;
+		result.ID = userID;
 		res.Result = "User updated Successfully"
-		json.NewEncoder(w).Encode(user)
+		json.NewEncoder(w).Encode(result)
 		return
 	}
 }
