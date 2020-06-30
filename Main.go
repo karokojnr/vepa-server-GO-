@@ -14,7 +14,7 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/register", controller.RegisterHandler).Methods("POST")
 	r.HandleFunc("/login", controller.LoginHandler).Methods("POST")
-	r.HandleFunc("/editProfile/{id}", controller.EditProfileHandler).Methods("PUT")
+	r.HandleFunc("/editProfile", controller.EditProfileHandler).Methods("PUT")
 	r.HandleFunc("/addVehicle", controller.AddVehicleHandler).Methods("POST")
 	r.HandleFunc("/editVehicle/{id}", controller.EditVehicleHandler).Methods("PUT")
 	r.HandleFunc("/makePayment", controller.PaymentHandler).Methods("POST")
