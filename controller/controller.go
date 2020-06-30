@@ -171,11 +171,27 @@ func ProfileHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return []byte("secret"), nil
 	})
-	var result model.User
+	var params = mux.Vars(r)
+	//Get id from parameters
+	userid := params["id"]
+	id, _ := primitive.ObjectIDFromHex(userid)
+	var user model.User
 	var res model.ResponseResult
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		result.Email = claims["email"].(string)
-		json.NewEncoder(w).Encode(result)
+	collection, err := db.GetUserCollection()
+	if err != nil {
+		res.Error = err.Error()
+		json.NewEncoder(w).Encode(res)
+		return
+	}
+	if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		filter := bson.M{"_id": id}
+		err := collection.FindOne(context.TODO(), filter).Decode(&user)
+		if err != nil {
+			res.Error = "Unsuccessful!"
+			json.NewEncoder(w).Encode(res)
+			return
+		}
+		json.NewEncoder(w).Encode(user)
 		return
 	}
 	res.Error = err.Error()
@@ -196,18 +212,21 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 	})
 	var user model.User
 	var res model.ResponseResult
-	body, _ := ioutil.ReadAll(r.Body)
-	err = json.Unmarshal(body, &user)
+	// body, _ := ioutil.ReadAll(r.Body)
+	// err = json.Unmarshal(body, &user)
 	collection, err := db.GetUserCollection()
 	if err != nil {
 		res.Error = err.Error()
 		json.NewEncoder(w).Encode(res)
 		return
 	}
+
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		id := claims["id"].(string)
 		userID, _ := primitive.ObjectIDFromHex(id)
 		filter := bson.M{"userId": userID}
+		// Read update model from body request
+		_ = json.NewDecoder(r.Body).Decode(&user)
 		update := bson.M{"$set": bson.M{
 			"firstName":   user.Firstname,
 			"lastName":    user.Lastname,
@@ -215,14 +234,17 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 			"idNumber":    user.IDNumber,
 			"phoneNumber": user.PhoneNumber,
 		}}
-		_, err := collection.UpdateOne(context.TODO(), filter, update)
+		var result model.User
+		err := collection.FindOneAndUpdate(context.TODO(), filter, update).Decode(&result)
 		if err != nil {
 			fmt.Printf("error...")
 			return
 
 		}
+		fmt.Println("Past error")
+		// user.ID = id;
 		res.Result = "User updated Successfully"
-		json.NewEncoder(w).Encode(res)
+		json.NewEncoder(w).Encode(user)
 		return
 	}
 }
