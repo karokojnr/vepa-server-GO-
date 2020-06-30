@@ -245,7 +245,7 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 
 		}
 		fmt.Println("Past error")
-		// user.ID = id;
+		user.ID = userID;
 		res.Result = "User updated Successfully"
 		json.NewEncoder(w).Encode(user)
 		return
