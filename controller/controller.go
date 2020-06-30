@@ -223,8 +223,10 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		id := claims["id"].(string)
-		userID, _ := primitive.ObjectIDFromHex(id)
-		filter := bson.M{"userId": userID}
+		// userID, _ := primitive.ObjectIDFromHex(id)
+		filter := bson.M{"userId": id}
+		fmt.Println(id)
+		fmt.Println(filter)
 		// Read update model from body request
 		_ = json.NewDecoder(r.Body).Decode(&user)
 		update := bson.M{"$set": bson.M{
@@ -234,10 +236,11 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 			"idNumber":    user.IDNumber,
 			"phoneNumber": user.PhoneNumber,
 		}}
+		fmt.Println(update)
 		var result model.User
-		err := collection.FindOneAndUpdate(context.TODO(), filter, update).Decode(&result)
-		if err != nil {
-			fmt.Printf("error...")
+		erru := collection.FindOneAndUpdate(context.TODO(), filter, update).Decode(&result)
+		if erru != nil {
+			fmt.Println("error...")
 			return
 
 		}
