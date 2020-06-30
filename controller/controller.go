@@ -238,7 +238,7 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 		}}
 		fmt.Println(update)
 		// var result model.User
-		_,err := collection.UpdateOne(context.TODO(), filter, update)
+		err := collection.FindOneAndUpdate(context.TODO(), filter, update)
 		if err != nil {
 			fmt.Println("error...")
 			return
