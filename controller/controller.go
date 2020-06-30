@@ -210,10 +210,10 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return []byte("secret"), nil
 	})
-	var params = mux.Vars(r)
-	//Get id from parameters
-	vehicleid := params["id"]
-	id, _ := primitive.ObjectIDFromHex(vehicleid)
+	// var params = mux.Vars(r)
+	// //Get id from parameters
+	// vehicleid := params["id"]
+	// id, _ := primitive.ObjectIDFromHex(vehicleid)
 	var user model.User
 	var res model.ResponseResult
 	// body, _ := ioutil.ReadAll(r.Body)
@@ -225,10 +225,10 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		// id := claims["id"].(string)
-		// userID, _ := primitive.ObjectIDFromHex(id)
-		filter := bson.M{"_id": id}
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		id := claims["id"].(string)
+		userID, _ := primitive.ObjectIDFromHex(id)
+		filter := bson.M{"_id": userID}
 		// fmt.Println(userID)
 		// fmt.Println(filter)
 		// Read update model from body request
@@ -251,7 +251,7 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 
 		}
 		// fmt.Println("Past error")
-		user.ID =  id
+		user.ID =  userID
 		// res.Result = "User updated Successfully"
 		json.NewEncoder(w).Encode(user)
 		return
