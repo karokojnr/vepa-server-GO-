@@ -468,6 +468,7 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(res)
 		return
 	}
+	var rUser model.User
 	var result model.Payment
 	err = collection.FindOne(context.TODO(), bson.M{"days": payment.Days, "isSuccessful": true}).Decode(&result)
 
@@ -536,7 +537,6 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 					id, _ := primitive.ObjectIDFromHex(userID)
 					filter := bson.M{"_id": id}
 
-					var rUser model.User
 					err = collection.FindOne(context.TODO(), filter).Decode(&rUser)
 					if err != nil {
 						if err.Error() == "mongo: no documents in result" {
@@ -574,6 +574,25 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(res)
 		return
 	}
+	//Send message...
+	msg := &fcm.Message{
+		To: rUser.FCMToken,
+		Data: map[string]interface{}{
+			"title": "Vepa",
+			"body":  "Kindly choose a date that you have not paid for!",
+		},
+	}
+	// Create a FCM client to send the message.
+	client, err := fcm.NewClient(env.GoDotEnvVariable("FCM_SERVER_KEY"))
+	if err != nil {
+		log.Fatalln(err)
+	}
+	// Send the message and receive the response without retries.
+	response, err := client.Send(msg)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	log.Printf("%#v\n", response)
 	fmt.Println("Already Paid")
 	res.Result = "Payment already Exists!!"
 	json.NewEncoder(w).Encode(res)
