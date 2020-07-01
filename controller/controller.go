@@ -251,7 +251,7 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 
 		}
 		// fmt.Println("Past error")
-		user.ID = userID
+		user.ID =  userID
 		// res.Result = "User updated Successfully"
 		json.NewEncoder(w).Encode(user)
 		return
@@ -468,139 +468,106 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(res)
 		return
 	}
-	var rUser model.User
-	var result model.Payment
-	err = collection.FindOne(context.TODO(), bson.M{"days": payment.Days, "isSuccessful": true}).Decode(&result)
+	// var result model.Payment
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		userID := claims["id"].(string)
+		payment.UserID = userID
+		payment.IsSuccessful = false
+		payment.PaymentID = primitive.NewObjectID()
 
-	if err != nil {
-		if err.Error() == "mongo: no documents in result" {
-			if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-				userID := claims["id"].(string)
-				payment.UserID = userID
-				payment.IsSuccessful = false
-				payment.PaymentID = primitive.NewObjectID()
+		fmt.Println("Payment Handeler Used ID:")
+		log.Println(userID)
+		_, err = collection.InsertOne(context.TODO(), payment)
+		if err != nil {
+			res.Error = "Error While Making Payment, Try Again"
+			json.NewEncoder(w).Encode(res)
+			return
+		}
 
-				fmt.Println("Payment Handeler Used ID:")
-				log.Println(userID)
-				_, err = collection.InsertOne(context.TODO(), payment)
-				if err != nil {
-					res.Error = "Error While Making Payment, Try Again"
+		// pID:= payment.PaymentID
+
+		res.Result = "Payment Added Successfully"
+		json.NewEncoder(w).Encode(res)
+		pID := payment.PaymentID.Hex()
+
+		var (
+			appKey    = env.GoDotEnvVariable("MPESA_APP_KEY")
+			appSecret = env.GoDotEnvVariable("MPESA_APP_SECRET")
+		)
+		svc, err := mpesa.New(appKey, appSecret, mpesa.SANDBOX)
+		if err != nil {
+			panic(err)
+		}
+
+		mres, err := svc.Simulation(mpesa.Express{
+			BusinessShortCode: "174379",
+			Password:          env.GoDotEnvVariable("MPESA_PASSWORD"),
+			Timestamp:         "20200421175555",
+			TransactionType:   "CustomerPayBillOnline",
+			Amount:            1,
+			PartyA:            "254799338805",
+			PartyB:            "174379",
+			PhoneNumber:       "254799338805",
+			CallBackURL:       "https://vepa-5c657.ew.r.appspot.com/rcb?id=" + userID + "&paymentid=" + pID,
+			AccountReference:  "Vepa",
+			TransactionDesc:   "Vepa Payment",
+		})
+
+		if err != nil {
+			log.Println("err")
+		}
+		var mresMap map[string]interface{}
+		errm := json.Unmarshal([]byte(mres), &mresMap)
+
+		if errm != nil {
+			panic(err)
+		}
+		rCode := mresMap["ResponseCode"]
+		rMessage := mresMap["ResponseDescription"]
+		cMessage := mresMap["CustomerMessage"]
+		log.Println(cMessage)
+		// Send error message if error
+		if rCode != 0 {
+			//Send message...
+			id, _ := primitive.ObjectIDFromHex(userID)
+			filter := bson.M{"_id": id}
+
+			var rUser model.User
+			err = collection.FindOne(context.TODO(), filter).Decode(&rUser)
+			if err != nil {
+				if err.Error() == "mongo: no documents in result" {
+					res.Result = "Something went wrong, Please try again later!"
 					json.NewEncoder(w).Encode(res)
 					return
 				}
-
-				// pID:= payment.PaymentID
-
-				res.Result = "Payment Added Successfully"
-				json.NewEncoder(w).Encode(res)
-				pID := payment.PaymentID.Hex()
-
-				var (
-					appKey    = env.GoDotEnvVariable("MPESA_APP_KEY")
-					appSecret = env.GoDotEnvVariable("MPESA_APP_SECRET")
-				)
-				svc, err := mpesa.New(appKey, appSecret, mpesa.SANDBOX)
-				if err != nil {
-					panic(err)
-				}
-
-				mres, err := svc.Simulation(mpesa.Express{
-					BusinessShortCode: "174379",
-					Password:          env.GoDotEnvVariable("MPESA_PASSWORD"),
-					Timestamp:         "20200421175555",
-					TransactionType:   "CustomerPayBillOnline",
-					Amount:            1,
-					PartyA:            "254799338805",
-					PartyB:            "174379",
-					PhoneNumber:       "254799338805",
-					CallBackURL:       "https://vepa-5c657.ew.r.appspot.com/rcb?id=" + userID + "&paymentid=" + pID,
-					AccountReference:  "Vepa",
-					TransactionDesc:   "Vepa Payment",
-				})
-
-				if err != nil {
-					log.Println("err")
-				}
-				var mresMap map[string]interface{}
-				errm := json.Unmarshal([]byte(mres), &mresMap)
-
-				if errm != nil {
-					panic(err)
-				}
-				rCode := mresMap["ResponseCode"]
-				rMessage := mresMap["ResponseDescription"]
-				cMessage := mresMap["CustomerMessage"]
-				log.Println(cMessage)
-				// Send error message if error
-				if rCode != 0 {
-					//Send message...
-					id, _ := primitive.ObjectIDFromHex(userID)
-					filter := bson.M{"_id": id}
-
-					err = collection.FindOne(context.TODO(), filter).Decode(&rUser)
-					if err != nil {
-						if err.Error() == "mongo: no documents in result" {
-							res.Result = "Something went wrong, Please try again later!"
-							json.NewEncoder(w).Encode(res)
-							return
-						}
-					}
-					msg := &fcm.Message{
-						To: rUser.FCMToken,
-						Data: map[string]interface{}{
-							"title": "Vepa",
-							"body":  rMessage,
-						},
-					}
-					// Create a FCM client to send the message.
-					client, err := fcm.NewClient(env.GoDotEnvVariable("FCM_SERVER_KEY"))
-					if err != nil {
-						log.Fatalln(err)
-					}
-					// Send the message and receive the response without retries.
-					response, err := client.Send(msg)
-					if err != nil {
-						log.Fatalln(err)
-					}
-					log.Printf("%#v\n", response)
-					return
-				}
-
-				log.Println(mres)
-				return
 			}
+			msg := &fcm.Message{
+				To: rUser.FCMToken,
+				Data: map[string]interface{}{
+					"title": "Vepa",
+					"body":  rMessage,
+				},
+			}
+			// Create a FCM client to send the message.
+			client, err := fcm.NewClient(env.GoDotEnvVariable("FCM_SERVER_KEY"))
+			if err != nil {
+				log.Fatalln(err)
+			}
+			// Send the message and receive the response without retries.
+			response, err := client.Send(msg)
+			if err != nil {
+				log.Fatalln(err)
+			}
+			log.Printf("%#v\n", response)
+			return
 		}
-		res.Error = err.Error()
-		json.NewEncoder(w).Encode(res)
+
+		log.Println(mres)
 		return
 	}
-	//Send message...
-	msg := &fcm.Message{
-		To: rUser.FCMToken,
-		Data: map[string]interface{}{
-			"title": "Vepa",
-			"body":  "Kindly choose a date that you have not paid for!",
-		},
-	}
-	// Create a FCM client to send the message.
-	client, err := fcm.NewClient(env.GoDotEnvVariable("FCM_SERVER_KEY"))
-	if err != nil {
-		log.Fatalln(err)
-	}
-	// Send the message and receive the response without retries.
-	response, err := client.Send(msg)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	log.Printf("%#v\n", response)
-	fmt.Println("Already Paid")
-	res.Result = "Payment already Exists!!"
+	res.Error = err.Error()
 	json.NewEncoder(w).Encode(res)
 	return
-
-	// res.Error = err.Error()
-	// json.NewEncoder(w).Encode(res)
-	// return
 
 }
 
