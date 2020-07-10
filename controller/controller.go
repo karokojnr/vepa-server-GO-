@@ -30,7 +30,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	var res model.ResponseResult
 	if err != nil {
 		res.Error = err.Error()
-		json.NewEncoder(w).Encode(res)
+		_ = json.NewEncoder(w).Encode(res)
 		return
 	}
 
@@ -167,7 +167,7 @@ func ProfileHandler(w http.ResponseWriter, r *http.Request) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// Don't forget to validate the alg is what you expect:
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method")
+			return nil, fmt.Errorf("Unexpected signing method.")
 		}
 		return []byte("secret"), nil
 	})
