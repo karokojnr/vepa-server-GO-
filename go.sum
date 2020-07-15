@@ -1,6 +1,8 @@
 github.com/AndroidStudyOpenSource/mpesa-api-go v0.0.0-20200405214254-b756218379d3 h1:px5Bjk3Co1pylVV9de7urZP30A8NtrRLJV9jFGURdLw=
 github.com/AndroidStudyOpenSource/mpesa-api-go v0.0.0-20200405214254-b756218379d3/go.mod h1:9UKwyRedMT1/4O6CkMso3gABGliFK6QsKO4a8qY7liM=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
+github.com/NaySoftware/go-fcm v0.0.0-20190516140123-808e978ddcd2 h1:0hjpEzUWez7uca/CUBhfidfotTCCI5fsj6Nb+TW5DLg=
+github.com/NaySoftware/go-fcm v0.0.0-20190516140123-808e978ddcd2/go.mod h1:3qVrdgWvoMZMoRG+/nusrCNrcP4RYU4MWGv467XjqLI=
 github.com/appleboy/go-fcm v0.1.5 h1:fKbcZf/7vwGsvDkcop8a+kCHnK+tt4wXX0X7uEzwI6E=
 github.com/appleboy/go-fcm v0.1.5/go.mod h1:MSxZ4LqGRsnywOjnlXJXMqbjZrG4vf+0oHitfC9HRH0=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

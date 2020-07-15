@@ -4,6 +4,7 @@ go 1.14
 
 require (
 	github.com/AndroidStudyOpenSource/mpesa-api-go v0.0.0-20200405214254-b756218379d3
+	github.com/NaySoftware/go-fcm v0.0.0-20190516140123-808e978ddcd2
 	github.com/appleboy/go-fcm v0.1.5
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gorilla/mux v1.7.4

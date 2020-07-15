@@ -7,13 +7,15 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	// "reflect"
+	"reflect"
 	"vepa/model"
 	"vepa/util/db"
 	"vepa/util/env"
+	"vepa/util/notificationsService"
+
+	//"vepa/util/notificationsService"
 
 	"github.com/AndroidStudyOpenSource/mpesa-api-go"
-	"github.com/appleboy/go-fcm"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
@@ -251,7 +253,7 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 
 		}
 		// fmt.Println("Past error")
-		user.ID =  userID
+		user.ID = userID
 		// res.Result = "User updated Successfully"
 		json.NewEncoder(w).Encode(user)
 		return
@@ -437,7 +439,7 @@ func UserVehiclesHandler(w http.ResponseWriter, r *http.Request) {
 		if err := cur.Err(); err != nil {
 			log.Fatal(err)
 		}
-		cur.Close(context.TODO())
+		_ = cur.Close(context.TODO())
 		json.NewEncoder(w).Encode(results)
 		return
 	}
@@ -448,6 +450,7 @@ func UserVehiclesHandler(w http.ResponseWriter, r *http.Request) {
 
 // PaymentHandler is...
 func PaymentHandler(w http.ResponseWriter, r *http.Request) {
+	go r.Body.Close()
 	w.Header().Set("Content-TYpe", "application/json")
 	tokenString := r.Header.Get("Authorization")
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
@@ -528,6 +531,7 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println(cMessage)
 		// Send error message if error
 		if rCode != 0 {
+
 			//Send message...
 			id, _ := primitive.ObjectIDFromHex(userID)
 			filter := bson.M{"_id": id}
@@ -541,27 +545,10 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 			}
-			msg := &fcm.Message{
-				To: rUser.FCMToken,
-				Data: map[string]interface{}{
-					"title": "Vepa",
-					"body":  rMessage,
-				},
-			}
-			// Create a FCM client to send the message.
-			client, err := fcm.NewClient(env.GoDotEnvVariable("FCM_SERVER_KEY"))
-			if err != nil {
-				log.Fatalln(err)
-			}
-			// Send the message and receive the response without retries.
-			response, err := client.Send(msg)
-			if err != nil {
-				log.Fatalln(err)
-			}
-			log.Printf("%#v\n", response)
+			//Send message...
+			notificationsService.SendNotifcation(rUser.FCMToken, rMessage)
 			return
 		}
-
 		log.Println(mres)
 		return
 	}
@@ -573,8 +560,9 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 
 // CallBackHandler is...
 func CallBackHandler(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
+	//defer r.Body.Close()
 	w.Header().Set("Content-Type", "application/json")
+	fmt.Println("IM INSIDE CALBACK")
 	var bd interface{}
 	rbody := r.Body
 	body, err := ioutil.ReadAll(rbody)
@@ -591,7 +579,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 	//extract userId
-	r.ParseForm() // Parses the request body
+	_ = r.ParseForm() // Parses the request body
 	userID := r.Form.Get("id")
 	paymentID := r.Form.Get("paymentid")
 	id, _ := primitive.ObjectIDFromHex(userID)
@@ -606,8 +594,11 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+
 	resultCode := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["ResultCode"]
 	rBody := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["ResultDesc"]
+	fmt.Println("RBODY TYPE:")
+	fmt.Println(reflect.TypeOf(rbody))
 	var item interface{}
 	var mpesaReceiptNumber interface{}
 	var transactionDate interface{}
@@ -652,27 +643,9 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	res.Result = "Payment updated"
 	json.NewEncoder(w).Encode(res)
-
 	//Send message...
-	msg := &fcm.Message{
-		To: result.FCMToken,
-		Data: map[string]interface{}{
-			"title": "Vepa",
-			"body":  rBody,
-		},
-	}
-	// Create a FCM client to send the message.
-	client, err := fcm.NewClient(env.GoDotEnvVariable("FCM_SERVER_KEY"))
-	if err != nil {
-		log.Fatalln(err)
-	}
-	// Send the message and receive the response without retries.
-	response, err := client.Send(msg)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	log.Printf("%#v\n", response)
-
+	notificationsService.SendNotifcation(result.FCMToken, rbody)
+	defer r.Body.Close()
 	return
 
 }
@@ -720,7 +693,7 @@ func UserPaymentsHandler(w http.ResponseWriter, r *http.Request) {
 		if err := cur.Err(); err != nil {
 			log.Fatal(err)
 		}
-		cur.Close(context.TODO())
+		_ = cur.Close(context.TODO())
 		json.NewEncoder(w).Encode(results)
 		return
 	}
