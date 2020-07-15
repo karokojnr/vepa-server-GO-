@@ -19,6 +19,7 @@ func SendNotifcation(fcmToken string, notificationBody interface{})  {
 	}
 	fmt.Println("IM HERE...")
 	// Create a FCM client to send the message.
+	// env.GoDotEnvVariable("FCM_SERVER_KEY")
 	client, err := fcm.NewClient(env.GoDotEnvVariable("FCM_SERVER_KEY"))
 	if err != nil {
 		log.Fatalln(err)

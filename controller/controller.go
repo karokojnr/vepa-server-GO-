@@ -25,6 +25,7 @@ import (
 
 // RegisterHandler is...
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
 	w.Header().Set("Content-Type", "application/json")
 	var user model.User
 	body, _ := ioutil.ReadAll(r.Body)
@@ -107,6 +108,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 // LoginHandler is...
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
 	w.Header().Set("Content-Type", "application/json")
 	var user model.User
 	body, _ := ioutil.ReadAll(r.Body)
@@ -262,6 +264,7 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 
 // FCMTokenHandler is...
 func FCMTokenHandler(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
 	w.Header().Set("Content-Type", "application/json")
 	tokenString := r.Header.Get("Authorization")
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
@@ -300,6 +303,7 @@ func FCMTokenHandler(w http.ResponseWriter, r *http.Request) {
 
 // AddVehicleHandler is...
 func AddVehicleHandler(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
 	w.Header().Set("Content-TYpe", "application/json")
 	tokenString := r.Header.Get("Authorization")
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
@@ -450,7 +454,7 @@ func UserVehiclesHandler(w http.ResponseWriter, r *http.Request) {
 
 // PaymentHandler is...
 func PaymentHandler(w http.ResponseWriter, r *http.Request) {
-	go r.Body.Close()
+	defer r.Body.Close()
 	w.Header().Set("Content-TYpe", "application/json")
 	tokenString := r.Header.Get("Authorization")
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
@@ -645,7 +649,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(res)
 	//Send message...
 	notificationsService.SendNotifcation(result.FCMToken, rbody)
-	defer r.Body.Close()
+	//defer r.Body.Close()
 	return
 
 }
