@@ -133,7 +133,6 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	w.Header().Set("Content-Type", "application/json")
-	fmt.Println("IM INSIDE CALBACK")
 	var bd interface{}
 	rbody := r.Body
 	body, err := ioutil.ReadAll(rbody)
@@ -194,6 +193,11 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewDecoder(r.Body).Decode(&paymenModel)
 	if resultCode != 0 {
 		paymenModel.IsSuccessful = false
+		rBodyConv := fmt.Sprintf("%v", rBody)
+		//Send message...
+		//time.Sleep(1 * time.Second)
+		util.SendNotifications(result.FCMToken, rBodyConv)
+		return
 	} else {
 		paymentUpdate := bson.M{"$set": bson.M{
 			"mpesaReceiptNumber": mpesaReceiptNumber,
@@ -216,6 +220,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 		util.SendNotifications(result.FCMToken, rBodyConv)
 		res.Result = "Payment updated"
 		json.NewEncoder(w).Encode(res)
+		return
 	}
 	return
 }
