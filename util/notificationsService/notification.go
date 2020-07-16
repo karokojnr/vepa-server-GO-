@@ -7,14 +7,13 @@ import (
 	"vepa/util/env"
 )
 
-func SendNotifcation(fcmToken string, notificationBody interface{})  {
-
+func SendNotifcation(fcmToken string, notificationBody string) {
 	//Send message...
 	msg := &fcm.Message{
 		To: fcmToken,
 		Data: map[string]interface{}{
 			"title": "Vepa",
-			"body":  notificationBody,
+			"body":  &notificationBody,
 		},
 	}
 	fmt.Println("IM HERE...")

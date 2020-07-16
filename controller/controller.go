@@ -549,8 +549,9 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 			}
+			rMessageConv := fmt.Sprintf("%v", rMessage)
 			//Send message...
-			notificationsService.SendNotifcation(rUser.FCMToken, rMessage)
+			notificationsService.SendNotifcation(rUser.FCMToken, rMessageConv)
 			return
 		}
 		log.Println(mres)
@@ -647,8 +648,9 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	res.Result = "Payment updated"
 	json.NewEncoder(w).Encode(res)
+	rBodyConv := fmt.Sprintf("%v", rBody)
 	//Send message...
-	notificationsService.SendNotifcation(result.FCMToken, rbody)
+	go notificationsService.SendNotifcation(result.FCMToken, rBodyConv)
 	//defer r.Body.Close()
 	return
 
