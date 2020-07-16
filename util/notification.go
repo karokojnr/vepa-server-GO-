@@ -1,13 +1,12 @@
-package notificationsService
+package util
 
 import (
 	"fmt"
 	"github.com/appleboy/go-fcm"
 	"log"
-	"vepa/util/env"
 )
 
-func SendNotifcation(fcmToken string, notificationBody string) {
+func SendNotifications(fcmToken string, notificationBody string) {
 	//Send message...
 	msg := &fcm.Message{
 		To: fcmToken,
@@ -16,10 +15,9 @@ func SendNotifcation(fcmToken string, notificationBody string) {
 			"body":  &notificationBody,
 		},
 	}
-	fmt.Println("IM HERE...")
 	// Create a FCM client to send the message.
 	// env.GoDotEnvVariable("FCM_SERVER_KEY")
-	client, err := fcm.NewClient(env.GoDotEnvVariable("FCM_SERVER_KEY"))
+	client, err := fcm.NewClient(GoDotEnvVariable("FCM_SERVER_KEY"))
 	if err != nil {
 		log.Fatalln(err)
 	}

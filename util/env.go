@@ -1,4 +1,4 @@
-package env
+package util
 
 import (
 	"github.com/joho/godotenv"
