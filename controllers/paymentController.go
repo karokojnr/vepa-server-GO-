@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"reflect"
-	"time"
 	"vepa/model"
 	"vepa/util"
 	//"vepa/util/notificationsService"
@@ -18,6 +17,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
+
 // PaymentHandler is...
 func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
@@ -131,7 +131,7 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 
 // CallBackHandler is...
 func CallBackHandler(w http.ResponseWriter, r *http.Request) {
-	//defer r.Body.Close()
+	defer r.Body.Close()
 	w.Header().Set("Content-Type", "application/json")
 	fmt.Println("IM INSIDE CALBACK")
 	var bd interface{}
@@ -191,33 +191,32 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	pid, _ := primitive.ObjectIDFromHex(paymentID)
 	paymentFilter := bson.M{"_id": pid}
 	var paymenModel model.Payment
-	fmt.Println("Payment ID")
-	log.Println(paymentID)
 	_ = json.NewDecoder(r.Body).Decode(&paymenModel)
 	if resultCode != 0 {
 		paymenModel.IsSuccessful = false
-	}
-	paymentUpdate := bson.M{"$set": bson.M{
-		"mpesaReceiptNumber": mpesaReceiptNumber,
-		"resultCode":         resultCode,
-		"resultDesc":         rBody,
-		"transactionDate":    transactionDate,
-		"phoneNumber":        phoneNumber,
-		"checkoutRequestID":  checkoutRequestID,
-		"isSuccessful":       true,
-	}}
-	errp := paymentCollection.FindOneAndUpdate(context.TODO(), paymentFilter, paymentUpdate).Decode(&paymenModel)
-	if errp != nil {
-		fmt.Printf("error...")
-		return
+	} else {
+		paymentUpdate := bson.M{"$set": bson.M{
+			"mpesaReceiptNumber": mpesaReceiptNumber,
+			"resultCode":         resultCode,
+			"resultDesc":         rBody,
+			"transactionDate":    transactionDate,
+			"phoneNumber":        phoneNumber,
+			"checkoutRequestID":  checkoutRequestID,
+			"isSuccessful":       true,
+		}}
+		errp := paymentCollection.FindOneAndUpdate(context.TODO(), paymentFilter, paymentUpdate).Decode(&paymenModel)
+		if errp != nil {
+			fmt.Printf("error...")
+			return
 
+		}
+		rBodyConv := fmt.Sprintf("%v", rBody)
+		//Send message...
+		//time.Sleep(1 * time.Second)
+		util.SendNotifications(result.FCMToken, rBodyConv)
+		res.Result = "Payment updated"
+		json.NewEncoder(w).Encode(res)
 	}
-	rBodyConv := fmt.Sprintf("%v", rBody)
-	//Send message...
-	time.Sleep(2 * time.Second)
-	util.SendNotifications(result.FCMToken, rBodyConv)
-	res.Result = "Payment updated"
-	json.NewEncoder(w).Encode(res)
 	return
 }
 
