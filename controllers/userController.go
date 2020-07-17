@@ -148,7 +148,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(res)
 		return
 	}
-
 	result.Token = tokenString
 	result.Password = ""
 	result.Exp = exp
@@ -156,6 +155,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(result)
 
 }
+
 // ProfileHandler is...
 func ProfileHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -258,39 +258,31 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 func FCMTokenHandler(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	w.Header().Set("Content-Type", "application/json")
-	tokenString := r.Header.Get("Authorization")
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		// Don't forget to validate the alg is what you expect:
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method")
-		}
-		return []byte("secret"), nil
-	})
+	var params = mux.Vars(r)
+	//Get id from parameters
+	userid := params["id"]
+	fmt.Println("Token User ID")
+	fmt.Println(userid)
 	var user model.User
 	var res model.ResponseResult
 	body, _ := ioutil.ReadAll(r.Body)
-	err = json.Unmarshal(body, &user)
+	err := json.Unmarshal(body, &user)
 	collection, err := util.GetUserCollection()
 	if err != nil {
 		res.Error = err.Error()
 		json.NewEncoder(w).Encode(res)
 		return
 	}
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		id := claims["id"].(string)
-		userID, _ := primitive.ObjectIDFromHex(id)
-		filter := bson.M{"_id": userID}
-		update := bson.M{"$set": bson.M{"fcmtoken": user.FCMToken}}
-		_, err := collection.UpdateOne(context.TODO(), filter, update)
-		if err != nil {
-			fmt.Printf("error...")
-			return
-
-		}
-		res.Result = "FCMToken updated"
-		json.NewEncoder(w).Encode(res)
+	userID, _ := primitive.ObjectIDFromHex(userid)
+	filter := bson.M{"_id": userID}
+	update := bson.M{"$set": bson.M{"fcmtoken": user.FCMToken}}
+	_, err = collection.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		fmt.Printf("error...")
 		return
+
 	}
+	res.Result = "FCMToken updated"
+	json.NewEncoder(w).Encode(res)
+	return
 }
-
-
