@@ -4,227 +4,171 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/AndroidStudyOpenSource/mpesa-api-go"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"reflect"
 	"vepa/model"
 	"vepa/util"
-	//"vepa/util/notificationsService"
 
-	"github.com/AndroidStudyOpenSource/mpesa-api-go"
-	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/dgrijalva/jwt-go"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // PaymentHandler is...
 func PaymentHandler(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
 	w.Header().Set("Content-TYpe", "application/json")
 	tokenString := r.Header.Get("Authorization")
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// Don't forget to validate the alg is what you expect:
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method")
+			return nil, fmt.Errorf("unexpected signing method")
 		}
 		return []byte("secret"), nil
 	})
 	var payment model.Payment
 	var res model.ResponseResult
-
 	body, _ := ioutil.ReadAll(r.Body)
 	err = json.Unmarshal(body, &payment)
-	collection, err := util.GetPaymentCollection()
+	paymentCollection, err := util.GetPaymentCollection()
 	if err != nil {
 		res.Error = "Error, Try Again Later"
 		json.NewEncoder(w).Encode(res)
 		return
 	}
-	// var result model.Payment
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		userID := claims["id"].(string)
 		payment.UserID = userID
 		payment.IsSuccessful = false
 		payment.PaymentID = primitive.NewObjectID()
+		//userID, _ := primitive.Hex(payment.PaymentID)
+		var result model.Payment
+		err = paymentCollection.FindOne(context.TODO(), bson.M{"_id": payment.PaymentID, "days": payment.Days}).Decode(&result)
 
-		fmt.Println("Payment Handeler Used ID:")
-		log.Println(userID)
-		_, err = collection.InsertOne(context.TODO(), payment)
 		if err != nil {
-			res.Error = "Error While Making Payment, Try Again"
+			if err.Error() == "mongo: no documents in result" {
+				//Insert data into Payment collection
+				_, err = paymentCollection.InsertOne(context.TODO(), payment)
+				if err != nil {
+					res.Error = "Error While Making Payment, Try Again"
+					json.NewEncoder(w).Encode(res)
+					return
+				}
+				log.Println("Payment Added Successfully")
+				res.Result = "Payment Added Successfully"
+				json.NewEncoder(w).Encode(res)
+				pID := payment.PaymentID.Hex()
+				//
+				//STK PUSH...
+				//GetPushHandler(w, userID, pID)
+				//
+				resp, err := http.Get("https://vepa-5c657.ew.r.appspot.com/paymentPush?userID=" + userID + "&pID=" + pID)
+				if err != nil {
+					panic(err)
+				}
+				defer resp.Body.Close()
+				//body, err := ioutil.ReadAll(resp.Body)
+				//if err != nil {
+				//	panic(err)
+				//}
+				//fmt.Printf("%s", body)
+
+			}
+			res.Error = "Kindly Choose a day that hasn't been paid for!"
 			json.NewEncoder(w).Encode(res)
 			return
 		}
 
-		// pID:= payment.PaymentID
-
-		res.Result = "Payment Added Successfully"
-		json.NewEncoder(w).Encode(res)
-		pID := payment.PaymentID.Hex()
-
-		var (
-			appKey    = util.GoDotEnvVariable("MPESA_APP_KEY")
-			appSecret = util.GoDotEnvVariable("MPESA_APP_SECRET")
-		)
-		svc, err := mpesa.New(appKey, appSecret, mpesa.SANDBOX)
-		if err != nil {
-			panic(err)
-		}
-
-		mres, err := svc.Simulation(mpesa.Express{
-			BusinessShortCode: "174379",
-			Password:          util.GoDotEnvVariable("MPESA_PASSWORD"),
-			Timestamp:         "20200421175555",
-			TransactionType:   "CustomerPayBillOnline",
-			Amount:            1,
-			PartyA:            "254799338805",
-			PartyB:            "174379",
-			PhoneNumber:       "254799338805",
-			CallBackURL:       "https://vepa-5c657.ew.r.appspot.com/rcb?id=" + userID + "&paymentid=" + pID,
-			AccountReference:  "Vepa",
-			TransactionDesc:   "Vepa Payment",
-		})
-
-		if err != nil {
-			log.Println("err")
-		}
-		var mresMap map[string]interface{}
-		errm := json.Unmarshal([]byte(mres), &mresMap)
-
-		if errm != nil {
-			panic(err)
-		}
-		rCode := mresMap["ResponseCode"]
-		rMessage := mresMap["ResponseDescription"]
-		cMessage := mresMap["CustomerMessage"]
-		log.Println(cMessage)
-		// Send error message if error
-		if rCode != 0 {
-
-			//Send message...
-			id, _ := primitive.ObjectIDFromHex(userID)
-			filter := bson.M{"_id": id}
-
-			var rUser model.User
-			err = collection.FindOne(context.TODO(), filter).Decode(&rUser)
-			if err != nil {
-				if err.Error() == "mongo: no documents in result" {
-					res.Result = "Something went wrong, Please try again later!"
-					json.NewEncoder(w).Encode(res)
-					return
-				}
-			}
-			rMessageConv := fmt.Sprintf("%v", rMessage)
-			//Send message...
-			util.SendNotifications(rUser.FCMToken, rMessageConv)
-			return
-		}
-		log.Println(mres)
-		return
 	}
-	res.Error = err.Error()
+	res.Error = "You are not Authorized!"
 	json.NewEncoder(w).Encode(res)
 	return
 
 }
-
-// CallBackHandler is...
-func CallBackHandler(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
-	w.Header().Set("Content-Type", "application/json")
-	var bd interface{}
-	rbody := r.Body
-	body, err := ioutil.ReadAll(rbody)
-	err = json.Unmarshal(body, &bd)
-	if err != nil {
-		log.Println("eRROR")
-	}
-	if err != nil {
-		panic(err)
-	}
+func GetPushHandler(w http.ResponseWriter, r *http.Request, ) {
+	//extract userId & paymentId
+	_ = r.ParseForm() // Parses the request body
+	userID := r.Form.Get("userID")
+	pID := r.Form.Get("pID")
+	// userID string, pID string
 	var res model.ResponseResult
+	//Get current logged in user details
+	var rUser model.User
+	id, _ := primitive.ObjectIDFromHex(userID)
+	filter := bson.M{"_id": id}
 	collection, err := util.GetUserCollection()
 	if err != nil {
 		log.Fatal(err)
 	}
-	//extract userId
-	_ = r.ParseForm() // Parses the request body
-	userID := r.Form.Get("id")
-	paymentID := r.Form.Get("paymentid")
-	id, _ := primitive.ObjectIDFromHex(userID)
-	filter := bson.M{"_id": id}
-
-	var result model.User
-	err = collection.FindOne(context.TODO(), filter).Decode(&result)
+	err = collection.FindOne(context.TODO(), filter).Decode(&rUser)
 	if err != nil {
 		if err.Error() == "mongo: no documents in result" {
-			res.Result = "Something went wrong, Please try again later!"
+			log.Println("User not Found!")
+			res.Result = "User not Found, Please try again later!"
 			json.NewEncoder(w).Encode(res)
 			return
 		}
 	}
-
-	resultCode := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["ResultCode"]
-	rBody := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["ResultDesc"]
-	fmt.Println("RBODY TYPE:")
-	fmt.Println(reflect.TypeOf(rbody))
-	var item interface{}
-	var mpesaReceiptNumber interface{}
-	var transactionDate interface{}
-	var phoneNumber interface{}
-
-	checkoutRequestID := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["CheckoutRequestID"]
-
-	if resultCode == 0 {
-		item = bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["CallbackMetadata"].(map[string]interface{})["Item"]
-		mpesaReceiptNumber = item.([]interface{})[1].(map[string]interface{})["Value"]
-		transactionDate = item.([]interface{})[3].(map[string]interface{})["Value"]
-		phoneNumber = item.([]interface{})[4].(map[string]interface{})["Value"]
-	}
-
-	paymentCollection, err := util.GetPaymentCollection()
+	//STK Push
+	var (
+		appKey    = util.GoDotEnvVariable("MPESA_APP_KEY")
+		appSecret = util.GoDotEnvVariable("MPESA_APP_SECRET")
+	)
+	svc, err := mpesa.New(appKey, appSecret, mpesa.SANDBOX)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
-	pid, _ := primitive.ObjectIDFromHex(paymentID)
-	paymentFilter := bson.M{"_id": pid}
-	var paymenModel model.Payment
-	_ = json.NewDecoder(r.Body).Decode(&paymenModel)
-	if resultCode != 0 {
-		paymenModel.IsSuccessful = false
-		rBodyConv := fmt.Sprintf("%v", rBody)
-		//Send message...
-		//time.Sleep(1 * time.Second)
-		util.SendNotifications(result.FCMToken, rBodyConv)
-		return
-	} else {
-		paymentUpdate := bson.M{"$set": bson.M{
-			"mpesaReceiptNumber": mpesaReceiptNumber,
-			"resultCode":         resultCode,
-			"resultDesc":         rBody,
-			"transactionDate":    transactionDate,
-			"phoneNumber":        phoneNumber,
-			"checkoutRequestID":  checkoutRequestID,
-			"isSuccessful":       true,
-		}}
-		errp := paymentCollection.FindOneAndUpdate(context.TODO(), paymentFilter, paymentUpdate).Decode(&paymenModel)
-		if errp != nil {
-			fmt.Printf("error...")
-			return
+	mres, err := svc.Simulation(mpesa.Express{
+		BusinessShortCode: "174379",
+		Password:          util.GoDotEnvVariable("MPESA_PASSWORD"),
+		Timestamp:         "20200421175555",
+		TransactionType:   "CustomerPayBillOnline",
+		Amount:            1,
+		PartyA:            rUser.PhoneNumber,
+		PartyB:            "174379",
+		PhoneNumber:       rUser.PhoneNumber,
+		CallBackURL:       "https://vepa-5c657.ew.r.appspot.com/rcb?id=" + userID + "&paymentid=" + pID,
+		AccountReference:  "Vepa",
+		TransactionDesc:   "Vepa Payment",
+	})
+	if err != nil {
+		log.Println("STK Push not sent")
+	}
 
-		}
-		rBodyConv := fmt.Sprintf("%v", rBody)
+	var mresMap map[string]interface{}
+	errm := json.Unmarshal([]byte(mres), &mresMap)
+	if errm != nil {
+		log.Println("Error decoding response body")
+		//panic(err)
+	}
+	rCode := mresMap["ResponseCode"]
+	rCodeString := fmt.Sprintf("%v", rCode)
+	rMessage := mresMap["ResponseDescription"]
+	cMessage := mresMap["CustomerMessage"]
+	log.Println(cMessage)
+	//...
+
+	// Send error message if error
+	if rCodeString == string('0') {
+		//// Proceed to STK Push
+		//log.Println("rCode is zero...")
+		//return
+		//Do nothing...
+
+	} else {
+		rMessageConv := fmt.Sprintf("%v", rMessage)
 		//Send message...
-		//time.Sleep(1 * time.Second)
-		util.SendNotifications(result.FCMToken, rBodyConv)
-		res.Result = "Payment updated"
-		json.NewEncoder(w).Encode(res)
+		util.SendNotifications(rUser.FCMToken, rMessageConv)
 		return
 	}
 	return
-}
 
+}
+// CallBackHandler is...
+func CallBackHandler(w http.ResponseWriter, r *http.Request) {
+	UpdatePayment(w, r)
+}
 // UserPaymentsHandler is...
 func UserPaymentsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-TYpe", "application/json")
@@ -232,7 +176,7 @@ func UserPaymentsHandler(w http.ResponseWriter, r *http.Request) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// Don't forget to validate the alg is what you expect:
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method")
+			return nil, fmt.Errorf("unexpected signing method")
 		}
 		return []byte("secret"), nil
 	})
@@ -250,8 +194,8 @@ func UserPaymentsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		userID := claims["id"].(string)
-		// userID, _ := primitive.ObjectIDFromHex(id)
-		filter := bson.M{"userId": userID}
+		//userID, _ := primitive.ObjectIDFromHex(id)
+		filter := bson.M{"userId": userID, "isSuccessful": true}
 		cur, err := collection.Find(context.TODO(), filter)
 		if err != nil {
 			log.Fatal(err)
@@ -275,4 +219,87 @@ func UserPaymentsHandler(w http.ResponseWriter, r *http.Request) {
 	res.Error = err.Error()
 	json.NewEncoder(w).Encode(res)
 	return
+}
+func UpdatePayment(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var bd interface{}
+	rbody := r.Body
+	body, err := ioutil.ReadAll(rbody)
+	err = json.Unmarshal(body, &bd)
+	if err != nil {
+		log.Println("eRROR")
+	}
+	var res model.ResponseResult
+	collection, err := util.GetUserCollection()
+	if err != nil {
+		log.Fatal(err)
+	}
+	//extract userId & paymentId
+	_ = r.ParseForm() // Parses the request body
+	userID := r.Form.Get("id")
+	paymentID := r.Form.Get("paymentid")
+	idUser, _ := primitive.ObjectIDFromHex(userID)
+	filter := bson.M{"_id": idUser}
+
+	var result model.User
+	err = collection.FindOne(context.TODO(), filter).Decode(&result)
+	if err != nil {
+		if err.Error() == "mongo: no documents in result" {
+			res.Result = "Something went wrong, Please try again later!"
+			json.NewEncoder(w).Encode(res)
+			return
+		}
+	}
+	resultCode := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["ResultCode"]
+	rBody := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["ResultDesc"]
+	checkoutRequestID := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["CheckoutRequestID"]
+
+	var item interface{}
+	var mpesaReceiptNumber interface{}
+	var transactionDate interface{}
+	var phoneNumber interface{}
+	var paymentModel model.Payment
+	resultCodeString := fmt.Sprintf("%v", resultCode)
+	resultDesc := fmt.Sprintf("%v", rBody)
+
+	if resultCodeString == string('0') {
+		item = bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["CallbackMetadata"].(map[string]interface{})["Item"]
+		mpesaReceiptNumber = item.([]interface{})[1].(map[string]interface{})["Value"]
+		transactionDate = item.([]interface{})[3].(map[string]interface{})["Value"]
+		phoneNumber = item.([]interface{})[4].(map[string]interface{})["Value"]
+
+		paymentCollection, err := util.GetPaymentCollection()
+		if err != nil {
+			log.Fatal(err)
+		}
+		pid, _ := primitive.ObjectIDFromHex(paymentID)
+		paymentFilter := bson.M{"_id": pid}
+		paymentUpdate := bson.M{"$set": bson.M{
+			"amount":             1,
+			"mpesaReceiptNumber": mpesaReceiptNumber,
+			"resultCode":         resultCode,
+			"resultDesc":         resultDesc,
+			"transactionDate":    transactionDate,
+			"phoneNumber":        phoneNumber,
+			"checkoutRequestID":  checkoutRequestID,
+			"isSuccessful":       true,
+		}}
+		err = paymentCollection.FindOneAndUpdate(context.TODO(), paymentFilter, paymentUpdate).Decode(&paymentModel)
+		if err != nil {
+			fmt.Printf("error...")
+			return
+
+		}
+		//Send message...
+		util.SendNotifications(result.FCMToken, resultDesc)
+		res.Result = "Payment updated"
+		json.NewEncoder(w).Encode(res)
+		return
+	} else {
+		paymentModel.IsSuccessful = false
+		//Send message...
+		util.SendNotifications(result.FCMToken, resultDesc)
+		return
+	}
+
 }
