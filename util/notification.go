@@ -2,8 +2,8 @@ package util
 
 import (
 	"fmt"
-	"log"
 	"github.com/appleboy/go-fcm"
+	"log"
 )
 
 func SendNotifications(fcmToken string, notificationBody string) {

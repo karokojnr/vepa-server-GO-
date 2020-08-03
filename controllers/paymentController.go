@@ -44,7 +44,7 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 		payment.PaymentID = primitive.NewObjectID()
 		//userID, _ := primitive.Hex(payment.PaymentID)
 		var result model.Payment
-		err = paymentCollection.FindOne(context.TODO(), bson.M{"_id": payment.PaymentID, "days": payment.Days}).Decode(&result)
+		err = paymentCollection.FindOne(context.TODO(), bson.M{"_id": payment.PaymentID, "days": payment.Days, "isSuccessful": true}).Decode(&result)
 
 		if err != nil {
 			if err.Error() == "mongo: no documents in result" {
@@ -165,10 +165,12 @@ func GetPushHandler(w http.ResponseWriter, r *http.Request, ) {
 	return
 
 }
+
 // CallBackHandler is...
 func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	UpdatePayment(w, r)
 }
+
 // UserPaymentsHandler is...
 func UserPaymentsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-TYpe", "application/json")
