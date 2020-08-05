@@ -18,6 +18,15 @@ jobs:
       with:
         go-version: ^1.13
       id: go
+    - name: Deploy
+      uses: karokojnr/vepa-server-go@master
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: ${{ secrets.SSH_PORT }}
+        script: |
+          scp -P 4500 -n vepa root@54.38.240.79:/var/www/vepa
 
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
