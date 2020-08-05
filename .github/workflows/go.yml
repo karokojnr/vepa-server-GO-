@@ -40,10 +40,10 @@ jobs:
       run: |
          eval $(ssh-agent -s)
          mkdir -p ~/.ssh
-         echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/ken_rsa
-         chmod 600 ~/.ssh/ken_rsa
+         echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/karoko_rsa
+         chmod 600 ~/.ssh/karoko_rsa
          eval "$(ssh-agent -s)"
-         ssh-add ~/.ssh/ken_rsa
+         ssh-add ~/.ssh/karoko_rsa
          scp -P 4500 -v vepa root@quebasetech.co.ke:/var/www/vepa
 #        ssh root@quebasetech.co.ke -p 4500 'bash -s' < deploy.sh
 #     - name: Test
