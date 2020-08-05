@@ -11,7 +11,7 @@ import (
 func Routes() {
 	r := mux.NewRouter()
 	r.HandleFunc("/register", controllers.RegisterHandler).Methods("POST")
-	r.HandleFunc("/login", controllers.LoginHandler).Methods("POST")
+	r.HandleFunc("/userLogin", controllers.LoginHandler).Methods("POST")
 	r.HandleFunc("/editProfile", controllers.EditProfileHandler).Methods("PUT")
 	r.HandleFunc("/addVehicle", controllers.AddVehicleHandler).Methods("POST")
 	r.HandleFunc("/editVehicle/{id}", controllers.EditVehicleHandler).Methods("PUT")
