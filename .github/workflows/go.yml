@@ -17,8 +17,8 @@ jobs:
         with:
           go-version: ^1.13
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            scp -P 4500 -v vepa root@quebasetech.co.ke:/var/www/vepa
+#          script: |
+#            scp -P 4500 -v vepa root@quebasetech.co.ke:/var/www/vepa
 
         id: go
 
@@ -35,12 +35,12 @@ jobs:
 
       - name: Build
         run: go build -v .
-#      - name: Deploy to server
-#        run: |
-#          eval $(ssh-agent -s)
-#          ssh-add <(echo "$SSH_PRIVATE_KEY")
-#          mkdir -p ~/.ssh
-#           scp -P 4500 -v vepa root@quebasetech.co.ke:/var/www/vepa
+      - name: Deploy to server
+        run: |
+          eval $(ssh-agent -s)
+          ssh-add <(echo "$SSH_PRIVATE_KEY")
+          mkdir -p ~/.ssh
+           scp -P 4500 -v vepa root@quebasetech.co.ke:/var/www/vepa
 #        ssh root@quebasetech.co.ke -p 4500 'bash -s' < deploy.sh
 #     - name: Test
 #       run: go test -v .
