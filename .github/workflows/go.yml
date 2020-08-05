@@ -38,12 +38,10 @@ jobs:
       run: go build -v .
     - name: Deploy to server
       run: |
-         eval $(ssh-agent -s)
-         mkdir -p ~/.ssh
-         echo "${SSH_PRIVATE_KEY}" | ssh-add - | tr -d '\r' > ~/.ssh/karoko_rsa
-         chmod 600 ~/.ssh/karoko_rsa
-         eval "$(ssh-agent -s)"
-         ssh-add ~/.ssh/karoko_rsa
+        eval $(ssh-agent -s)
+        ssh-add <(echo "$SSH_PRIVATE_KEY")
+        mkdir -p ~/.ssh
+        '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
          scp -P 4500 -v vepa root@quebasetech.co.ke:/var/www/vepa
 #        ssh root@quebasetech.co.ke -p 4500 'bash -s' < deploy.sh
 #     - name: Test
