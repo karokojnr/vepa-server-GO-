@@ -165,3 +165,40 @@ func UserVehiclesHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(res)
 	return
 }
+
+//DeleteVehicleHandler is...
+func DeleteVehicleHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	tokenString := r.Header.Get("Authorization")
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		// Don't forget to validate the alg is what you expect:
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method")
+		}
+		return []byte("secret"), nil
+	})
+	var params = mux.Vars(r)
+	//Get id from parameters
+	vehicleid := params["id"]
+	id, _ := primitive.ObjectIDFromHex(vehicleid)
+	vehicleCollection, err := util.GetVehicleCollection()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		// prepare filter.
+		filter := bson.M{"_id": id}
+
+		deleteResult, err := vehicleCollection.DeleteOne(context.TODO(), filter)
+
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		json.NewEncoder(w).Encode(deleteResult)
+
+	}
+
+}
