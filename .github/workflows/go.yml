@@ -19,7 +19,7 @@ jobs:
         go-version: ^1.13
       id: go
     - name: Deploy
-#      uses: karokojnr/vepa-server-go@master
+      uses: karokojnr/vepa-server-go@master
       with:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USERNAME }}
