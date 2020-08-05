@@ -31,7 +31,7 @@ jobs:
         fi
     - name: Deploy to server
       run: |
-        scp -P 4500 -v vepa root@quebasetech.co.ke:/var/www/vepa
+        scp -P 4500 -v vepa root@54.38.240.79:/var/www/vepa
 #        ssh root@54.38.240.79 -p 4500 'bash -s' < deploy.sh
 #    script:
 #      - go build -o vepa
