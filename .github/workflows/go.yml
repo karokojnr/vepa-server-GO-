@@ -44,10 +44,10 @@ jobs:
          chmod 600 ~/.ssh/ken_rsa
          eval "$(ssh-agent -s)"
          ssh-add ~/.ssh/ken_rsa
-         ssh-keyscan -H root@quebasetech.co.ke >> ~/.ssh/known_hosts
+#         ssh-keyscan -H root@quebasetech.co.ke >> ~/.ssh/known_hosts
 #        ssh-add <(echo "${SSH_PRIVATE_KEY}" | ssh-add -)
 #        mkdir -p ~/.ssh
-#        scp -P 4500 -v vepa root@quebasetech.co.ke:/var/www/vepa
+         scp -P 4500 -v vepa root@quebasetech.co.ke:/var/www/vepa
 #        ssh root@quebasetech.co.ke -p 4500 'bash -s' < deploy.sh
 #     - name: Test
 #       run: go test -v .
