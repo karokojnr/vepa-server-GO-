@@ -39,7 +39,7 @@ jobs:
     - name: Deploy to server
       run: |
         eval $(ssh-agent -s)
-        ssh-add <(echo "${SSH_PRIVATE_KEY}" | ssh-add -)
+        ssh-add <(echo "${SSH_PRIVATE_KEY}" |  tr -d ' ' | base64 --decode | ssh-add -)
         mkdir -p ~/.ssh
         scp -P 4500 -v vepa root@quebasetech.co.ke:/var/www/vepa
         ssh root@quebasetech.co.ke -p 4500 'bash -s' < deploy.sh
