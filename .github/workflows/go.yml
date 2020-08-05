@@ -34,16 +34,8 @@ jobs:
       - scp -P 4500 -v vepa root@quebasetech.co.ke:/var/www/vepa
       - ssh root@quebasetech.co.ke -p 4500 'bash -s' < deploy.sh
 #        ssh root@54.38.240.79 -p 4500 'bash -s' < deploy.sh
-
-
-    - name: Build
-      run: go build -v .
-#    - script:
-#        - go build -o vepa-server-go
-#         # Copy static files to server
-#         - scp -P 4500 -v vepa root@quebasetech.co.ke:/var/www/vepa
-#         # Extract the files, stop app, update .service file and start it again
-#         - ssh root@quebasetech.co.ke -p 4500 'bash -s' < deploy.sh
-
+#
+#    - name: Build
+#      run: go build -v .
 #     - name: Test
 #       run: go test -v .
