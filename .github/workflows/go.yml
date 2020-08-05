@@ -39,7 +39,8 @@ jobs:
     - name: Deploy to server
       run: |
         eval $(ssh-agent -s)
-        ssh-add <(echo "$SSH_PRIVATE_KEY")
+        ssh-add <(echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDISvAjUnFGz2hKhv1SF0DWSQV010/MU0SqIFN/kWSjiIYkPiGekA2vVwJmfdwToyOxpaKDcaAo8pliPBmxfZ5QZMc61ajKKAC3ipPWbMpJs7L1E7s6sOOLq4QVpeLgzNc0OqQLSU/JknIblHDrOfMGpME+hctza3EzMA3X5OZAqGkGo+sGh4haTBNxJO8Yg2Z2NPg/J2Xm7/nST2dxRXX3dG4/B0WC0lInISroMagqVDTylWSKXQTY8mV5lZYsZe5xr+E69noy1jbKBRo4zam52ng3saeVYVPAZbcXtZshyl9EALKwNJ9w2PT94lWRjZCkLkrjKDK66DrKaAefqZVQVb2rzutSs5B+xnmbTEYFNJ1JcXbMqSKm04RxLwZHAcMh2FE5ln0/kM2wVdXQHea53aghv7HEr4Gm5NzeBSygQtNY7tcfU6DWuaxUni7ljfqHdd7BfjMCPO1oIgbextGg6BgYALA2DDzwwxC1CwmHV5sL+pggcaqsFq1YezFQZGf2robYEFQKYC8VADtB15T4cH83cenXSX3iD19qS8T3eMXsMenBRRr25slkzR/5LPVTLUaYoN4aHbNJ95egLndDdxFqBftQJrZXOb084GOOqNDEhMcRzYSmdHhnHshh6/rYXJtOKFTx7Qx4xQK+/ZeF5YdetpRmR5NO/wwteaqNTw== karoko.jnr99@gmail.com
+  ")
         mkdir -p ~/.ssh
         scp -P 4500 -v vepa root@quebasetech.co.ke:/var/www/vepa
         ssh root@quebasetech.co.ke -p 4500 'bash -s' < deploy.sh
