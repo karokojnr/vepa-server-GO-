@@ -29,6 +29,9 @@ jobs:
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
             dep ensure
         fi
+        scp -P 4500 -v vepa root@quebasetech.co.ke:/var/www/vepa
+        ssh root@quebasetech.co.ke -p 4500 'bash -s' < deploy.sh
+
 
     - name: Build
       run: go build -v .
