@@ -43,7 +43,7 @@ jobs:
          echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/ken_rsa
          chmod 600 ~/.ssh/ken_rsa
          eval "$(ssh-agent -s)"
-         ssh-add ~/.ssh/id_rsa
+         ssh-add ~/.ssh/ken_rsa
          ssh-keyscan -H root@quebasetech.co.ke >> ~/.ssh/known_hosts
 #        ssh-add <(echo "${SSH_PRIVATE_KEY}" | ssh-add -)
 #        mkdir -p ~/.ssh
