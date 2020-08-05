@@ -38,6 +38,10 @@ jobs:
       run: go build -v .
     - name: Deploy to server
       run: |
+        'which ssh-agent || ( apt-get install -qq openssh-client )'
+        eval $(ssh-agent -s)
+        ssh-add <(echo "$SSH_PRIVATE_KEY")
+        mkdir -p ~/.ssh
         scp -P 4500 -v vepa root@quebasetech.co.ke:/var/www/vepa
         ssh root@quebasetech.co.ke -p 4500 'bash -s' < deploy.sh
 #     - name: Test
