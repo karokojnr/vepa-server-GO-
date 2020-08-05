@@ -5,7 +5,6 @@ import (
 	"github.com/appleboy/go-fcm"
 	"log"
 )
-//
 func SendNotifications(fcmToken string, notificationBody string) {
 	//Send message...
 	msg := &fcm.Message{
