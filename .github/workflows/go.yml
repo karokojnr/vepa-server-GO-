@@ -38,7 +38,7 @@ jobs:
       run: go build -v .
     - name: Deploy to server
       run: |
-        scp -P 4500 -v vepa root@54.38.240.79:/var/www/vepa
-        ssh root@54.38.240.79 -p 4500 'bash -s' < deploy.sh
+        scp -P 4500 -v vepa root@quebasetech.co.ke:/var/www/vepa
+        ssh root@quebasetech.co.ke -p 4500 'bash -s' < deploy.sh
 #     - name: Test
 #       run: go test -v .
