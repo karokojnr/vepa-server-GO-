@@ -7,6 +7,7 @@ import (
 	"vepa/controllers"
 	"vepa/util"
 )
+
 //
 
 func Routes() {
@@ -23,6 +24,7 @@ func Routes() {
 	r.HandleFunc("/profile/{id}", controllers.ProfileHandler).Methods("GET")
 	r.HandleFunc("/userVehicles", controllers.UserVehiclesHandler).Methods("GET")
 	r.HandleFunc("/userPayments", controllers.UserPaymentsHandler).Methods("GET")
+	r.HandleFunc("/fetchPaidDays/{vehicleReg}", controllers.GetPaidDays).Methods("GET")
 	r.HandleFunc("/paymentPush", controllers.GetPushHandler).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(util.GetPort(), r))

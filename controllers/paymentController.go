@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/AndroidStudyOpenSource/mpesa-api-go"
+	"github.com/gorilla/mux"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -86,6 +87,7 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 	return
 
 }
+//GetPushHandler is..
 func GetPushHandler(w http.ResponseWriter, r *http.Request, ) {
 	//extract userId & paymentId
 	_ = r.ParseForm() // Parses the request body
@@ -173,7 +175,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 
 // UserPaymentsHandler is...
 func UserPaymentsHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-TYpe", "application/json")
+	w.Header().Set("Content-Type", "application/json")
 	tokenString := r.Header.Get("Authorization")
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// Don't forget to validate the alg is what you expect:
@@ -222,6 +224,7 @@ func UserPaymentsHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(res)
 	return
 }
+//UpdatePayment
 func UpdatePayment(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var bd interface{}
@@ -303,5 +306,53 @@ func UpdatePayment(w http.ResponseWriter, r *http.Request) {
 		util.SendNotifications(result.FCMToken, resultDesc)
 		return
 	}
+
+}
+
+// GetPaidDays given vehicle registration number...
+func GetPaidDays(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	//tokenString := r.Header.Get("Authorization")
+	//token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+	//	// Don't forget to validate the alg is what you expect:
+	//	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+	//		return nil, fmt.Errorf("unexpected signing method")
+	//	}
+	//	return []byte("secret"), nil
+	//})
+	var params = mux.Vars(r)
+	vehicleReg := params["vehicleReg"]
+	//var res model.ResponseResult
+	var results []*model.Payment
+	paymentCollection, err := util.GetPaymentCollection()
+	if err != nil {
+		log.Println(err)
+	}
+
+	//if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		//userID := claims["id"].(string)
+		filter := bson.M{"vehicleReg": vehicleReg,"isSuccessful": true}
+		cur, err := paymentCollection.Find(context.TODO(), filter)
+		if err != nil {
+			log.Fatal(err)
+		}
+		for cur.Next(context.TODO()) {
+			var elem model.Payment
+			err := cur.Decode(&elem)
+			if err != nil {
+				log.Fatal(err)
+			}
+			results = append(results, &elem)
+		}
+		if err := cur.Err(); err != nil {
+			log.Fatal(err)
+		}
+		_ = cur.Close(context.TODO())
+		json.NewEncoder(w).Encode(results)
+		return
+	//}
+	//res.Error = err.Error()
+	//json.NewEncoder(w).Encode(res)
+	//return
 
 }
