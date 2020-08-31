@@ -1,15 +1,15 @@
 package routes
 
 import (
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"vepa/controllers"
 	"vepa/util"
+
+	"github.com/gorilla/mux"
 )
 
-//
-
+//Routes is...
 func Routes() {
 	r := mux.NewRouter()
 	r.HandleFunc("/register", controllers.RegisterHandler).Methods("POST")
@@ -25,7 +25,8 @@ func Routes() {
 	r.HandleFunc("/userVehicles", controllers.UserVehiclesHandler).Methods("GET")
 	r.HandleFunc("/userPayments", controllers.UserPaymentsHandler).Methods("GET")
 	r.HandleFunc("/fetchPaidDays/{vehicleReg}", controllers.GetPaidDays).Methods("GET")
-	r.HandleFunc("/paymentPush", controllers.GetPushHandler).Methods("GET")
+	r.HandleFunc("/verifyPayment/{vehicleReg}", controllers.VerificationHandler).Methods("GET")
+	// r.HandleFunc("/paymentPush", controllers.GetPushHandler).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(util.GetPort(), r))
 }
