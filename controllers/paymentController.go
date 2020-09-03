@@ -266,7 +266,7 @@ func UserPaymentsHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(results)
 		return
 	}
-	res.Error = err.Error()
+	res.Error = "You are not Authorized!"
 	json.NewEncoder(w).Encode(res)
 	return
 }
