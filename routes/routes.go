@@ -27,5 +27,7 @@ func Routes() {
 	r.HandleFunc("/fetchPaidDays/{vehicleReg}", controllers.GetPaidDays).Methods("GET")
 	r.HandleFunc("/verifyPayment/{vehicleReg}", controllers.VerificationHandler).Methods("GET")
 	r.HandleFunc("/unpaidVehicleHistory/{vehicleReg}", controllers.UnpaidVehicleHistoryHandler).Methods("GET")
+	r.HandleFunc("/clampVehicle/{vehicleReg}", controllers.ClampVehicle).Methods("GET")
+
 	log.Fatal(http.ListenAndServe(util.GetPort(), r))
 }

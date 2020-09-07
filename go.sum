@@ -1,3 +1,5 @@
+github.com/AndroidStudyOpenSource/africastalking-go v0.0.0-20200515172509-94a151ad63fe h1:uXPOrFHjkAP3NgAfOXgDwuRa3nkX3w71jT7zYGJFvFk=
+github.com/AndroidStudyOpenSource/africastalking-go v0.0.0-20200515172509-94a151ad63fe/go.mod h1:1oj0QW+1duBl8Ono/Gg2NhXpu8fAqFrquBejPq2qy14=
 github.com/AndroidStudyOpenSource/mpesa-api-go v0.0.0-20200405214254-b756218379d3 h1:px5Bjk3Co1pylVV9de7urZP30A8NtrRLJV9jFGURdLw=
 github.com/AndroidStudyOpenSource/mpesa-api-go v0.0.0-20200405214254-b756218379d3/go.mod h1:9UKwyRedMT1/4O6CkMso3gABGliFK6QsKO4a8qY7liM=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=

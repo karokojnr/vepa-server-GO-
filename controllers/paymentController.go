@@ -14,6 +14,7 @@ import (
 	"vepa/model"
 	"vepa/util"
 
+	"github.com/AndroidStudyOpenSource/africastalking-go/sms"
 	"github.com/AndroidStudyOpenSource/mpesa-api-go"
 	"github.com/gorilla/mux"
 
@@ -405,4 +406,56 @@ func UnpaidVehicleHistoryHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//TODO: Sende message 30 mins prior to clamping vehicle
+//ClampVehicle is...
+func ClampVehicle(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var params = mux.Vars(r)
+	vehicleReg := params["vehicleReg"]
+
+	//TODO: Find vehicle
+	var vehicle model.Vehicle
+	//var res model.ResponseResult
+
+	vehicleCollection, err := util.GetVehicleCollection()
+	if err != nil {
+		log.Println(err)
+	}
+	filter := bson.M{"registrationNumber": vehicleReg}
+	err = vehicleCollection.FindOne(context.TODO(), filter).Decode(&vehicle)
+	if err != nil {
+		log.Println(err)
+	}
+	//Find userID to get the phone number
+	uID := vehicle.UserID
+	userID, _ := primitive.ObjectIDFromHex(uID)
+
+	var user model.User
+	userCollection, err := util.GetUserCollection()
+	if err != nil {
+		log.Println(err)
+	}
+	err = userCollection.FindOne(context.TODO(), bson.M{"_id": userID}).Decode(&user)
+	if err != nil {
+		log.Println(err)
+	}
+	userPhoneNumber := user.PhoneNumber
+	//Test if phone number is available
+	log.Println("---Phone Number---")
+	log.Println(userPhoneNumber)
+	var (
+		username = "karokojnr"                                        //Your Africa's Talking Username
+		apiKey   = util.GoDotEnvVariable("AFRICA_IS_TALKING_API_KEY") //Production or Sandbox API Key
+		env      = "production"                                       // Choose either Sandbox or Production
+	)
+	//Call the Gateway, and pass the constants here!
+	smsService := sms.NewService(username, apiKey, env)
+	plus := "+"
+
+	//Send SMS - REPLACE Recipient and Message with REAL Values
+	smsResponse, err := smsService.Send("", plus+userPhoneNumber, "Hello, Your have not paid for your vehicle. It will be clamped in 30 minutes incase you don't pay. Kindly make a payment now. ")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(smsResponse)
+
+}
