@@ -25,7 +25,7 @@ import (
 
 // PaymentHandler is...
 func PaymentHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-TYpe", "application/json")
+	w.Header().Set("Content-Type", "application/json")
 	tokenString := r.Header.Get("Authorization")
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -137,16 +137,23 @@ func GetPushHandler(userID string, pID string) {
 
 // CallBackHandler is...
 func CallBackHandler(w http.ResponseWriter, r *http.Request) {
+	util.Log("Callback called by mpesa...")
 	// Update Payment if payment was successful
 	w.Header().Set("Content-Type", "application/json")
+	var res model.ResponseResult
 	var bd interface{}
 	rbody := r.Body
 	body, err := ioutil.ReadAll(rbody)
 	err = json.Unmarshal(body, &bd)
+	util.Log("Reading request body...")
 	if err != nil {
-		log.Println("eRROR")
+		log.Println("Error")
+		util.Log("Error parsing request:", err.Error())
+		res.Result = "Unable to read request"
+		json.NewEncoder(w).Encode(res)
+		return
 	}
-	var res model.ResponseResult
+
 	collection, err := util.GetUserCollection()
 	if err != nil {
 		log.Fatal(err)
@@ -155,20 +162,31 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	_ = r.ParseForm() // Parses the request body
 	userID := r.Form.Get("id")
 	paymentID := r.Form.Get("paymentid")
+	util.Log("Getting data from request...")
+	util.Log("User ID:", userID, " Payment ID:", paymentID)
 	idUser, _ := primitive.ObjectIDFromHex(userID)
 	filter := bson.M{"_id": idUser}
 	var result model.User
 	err = collection.FindOne(context.TODO(), filter).Decode(&result)
 	if err != nil {
+		util.Log("Error fetching user:", err.Error())
 		if err.Error() == "mongo: no documents in result" {
 			res.Result = "Something went wrong, Please try again later!"
 			json.NewEncoder(w).Encode(res)
 			return
 		}
+		res.Result = "Error fetching user doc"
+		json.NewEncoder(w).Encode(res)
+		return
 	}
+	util.Log("User found:", result.Firstname, " Phone No:", result.PhoneNumber)
+
+	util.Log("Reading result body...")
 	resultCode := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["ResultCode"]
 	rBody := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["ResultDesc"]
 	checkoutRequestID := bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["CheckoutRequestID"]
+
+	util.Log("Result code:", resultCode, " Result Body:", rBody, " checkoutRequestID:", checkoutRequestID)
 
 	var item interface{}
 	var mpesaReceiptNumber interface{}
@@ -184,7 +202,10 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 		transactionDate = item.([]interface{})[3].(map[string]interface{})["Value"]
 		//phoneNumber = item.([]interface{})[4].(map[string]interface{})["Value"]
 		// phoneNumber = result.PhoneNumber
-
+		util.Log("item:", item)
+		util.Log("mpesaReceiptNumber:", mpesaReceiptNumber)
+		util.Log("transactionDate:", transactionDate)
+		util.Log("Fetching payment from db...")
 		paymentCollection, err := util.GetPaymentCollection()
 		if err != nil {
 			log.Fatal(err)
@@ -203,16 +224,19 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 		}}
 		err = paymentCollection.FindOneAndUpdate(context.TODO(), paymentFilter, paymentUpdate).Decode(&paymentModel)
 		if err != nil {
+			util.Log("Error fetching payment:", err.Error())
 			fmt.Printf("error...")
 			return
 
 		}
+		util.Log("Payment updated successfully...")
 		//Send message(Payment was successful)...
 		util.SendNotifications(result.FCMToken, resultDesc)
 		res.Result = "Payment updated"
 		json.NewEncoder(w).Encode(res)
 		return
 	}
+	util.Log("Payment no successful")
 	paymentModel.IsSuccessful = false
 	//Send message(In case update was not successful)...
 	util.SendNotifications(result.FCMToken, resultDesc)
