@@ -1,1 +1,7 @@
 .env
+
+build
+vepa
+go.sum
+
+logs/*.log

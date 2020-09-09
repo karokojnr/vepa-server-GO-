@@ -11,6 +11,8 @@ import (
 
 //Routes is...
 func Routes() {
+	util.Log("Initializing routes...")
+
 	r := mux.NewRouter()
 	r.HandleFunc("/register", controllers.RegisterHandler).Methods("POST")
 	r.HandleFunc("/userLogin", controllers.LoginHandler).Methods("POST")
@@ -29,5 +31,9 @@ func Routes() {
 	r.HandleFunc("/unpaidVehicleHistory/{vehicleReg}", controllers.UnpaidVehicleHistoryHandler).Methods("GET")
 	r.HandleFunc("/clampVehicle/{vehicleReg}", controllers.ClampVehicle).Methods("GET")
 
-	log.Fatal(http.ListenAndServe(util.GetPort(), r))
+	port := util.GetPort()
+
+	util.Log("Starting app on port 👍 ✓ ⌛ :", port)
+
+	log.Fatal(http.ListenAndServe(port, r))
 }
