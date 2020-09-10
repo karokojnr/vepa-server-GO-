@@ -11,4 +11,3 @@ func main() {
 	util.InitLogger()
 	routes.Routes()
 }
-

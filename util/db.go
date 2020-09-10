@@ -4,41 +4,25 @@ import (
 	"context"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"log"
+	"reflect"
 	"time"
 )
 
-// GetUserCollection is...
-func GetUserCollection() (*mongo.Collection, error) {
+func GetCollection(collectionName string) (*mongo.Collection, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(GoDotEnvVariable("MONGO_URI")))
 	if err != nil {
 		return nil, err
 	}
-	collection := client.Database("vepadb").Collection("users")
-	return collection, nil
-}
+	log.Println("---Client Type---")
+	log.Println(reflect.TypeOf(client))
 
-// GetVehicleCollection is...
-func GetVehicleCollection() (*mongo.Collection, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(GoDotEnvVariable("MONGO_URI")))
-	if err != nil {
-		return nil, err
-	}
-	collection := client.Database("vepadb").Collection("vehicles")
+	//var collection *mongo.Collection
+	//c *mongo.Database
+	db := client.Database("vepadb")
+	collection := db.Collection(collectionName)
 	return collection, nil
-}
 
-// GetPaymentCollection is...
-func GetPaymentCollection() (*mongo.Collection, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(GoDotEnvVariable("MONGO_URI")))
-	if err != nil {
-		return nil, err
-	}
-	collection := client.Database("vepadb").Collection("payments")
-	return collection, nil
 }

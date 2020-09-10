@@ -6,7 +6,6 @@ import (
 	"os"
 )
 
-// GoDotEnvVariable is...
 func GoDotEnvVariable(key string) string {
 	// load .env file
 	err := godotenv.Load(".env")

@@ -12,6 +12,8 @@
 # below:
 .git
 .gitignore
+-2020-09-09.log
+.log
 
 # Binaries for programs and plugins
 *.exe

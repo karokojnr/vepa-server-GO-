@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/kyokomi/emoji"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -16,14 +17,12 @@ import (
 
 	"github.com/AndroidStudyOpenSource/africastalking-go/sms"
 	"github.com/AndroidStudyOpenSource/mpesa-api-go"
-	"github.com/gorilla/mux"
-
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// PaymentHandler is...
 func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	tokenString := r.Header.Get("Authorization")
@@ -37,7 +36,7 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 	var res model.ResponseResult
 	body, _ := ioutil.ReadAll(r.Body)
 	err = json.Unmarshal(body, &payment)
-	paymentCollection, err := util.GetPaymentCollection()
+	paymentCollection, err := util.GetCollection("payments")
 	if err != nil {
 		res.Error = "Error, Try Again Later"
 		json.NewEncoder(w).Encode(res)
@@ -68,13 +67,12 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//GetPushHandler is..
 func GetPushHandler(userID string, pID string) {
 	id, _ := primitive.ObjectIDFromHex(userID)
 	filter := bson.M{"_id": id}
 	// Get user to know the USER PHONE NUMBER
 	var rUser model.User
-	collection, err := util.GetUserCollection()
+	collection, err := util.GetCollection("users")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -103,7 +101,7 @@ func GetPushHandler(userID string, pID string) {
 		PartyA:            rUser.PhoneNumber,
 		PartyB:            "174379",
 		PhoneNumber:       rUser.PhoneNumber,
-		CallBackURL:       "https://vepa-5c657.ew.r.appspot.com/rcb?id=" + userID + "&paymentid=" + pID, //CallBackHandler
+		CallBackURL:       "http://quebasetech.co.ke:4000/rcb?id=" + userID + "&paymentid=" + pID, //CallBackHandler
 		AccountReference:  "Vepa",
 		TransactionDesc:   "Vepa Payment",
 	})
@@ -135,7 +133,6 @@ func GetPushHandler(userID string, pID string) {
 
 }
 
-// CallBackHandler is...
 func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 	util.Log("Callback called by mpesa...")
 	// Update Payment if payment was successful
@@ -154,7 +151,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	collection, err := util.GetUserCollection()
+	collection, err := util.GetCollection("users")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -206,7 +203,7 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 		util.Log("mpesaReceiptNumber:", mpesaReceiptNumber)
 		util.Log("transactionDate:", transactionDate)
 		util.Log("Fetching payment from db...")
-		paymentCollection, err := util.GetPaymentCollection()
+		paymentCollection, err := util.GetCollection("payments")
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -244,7 +241,6 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// UserPaymentsHandler is...
 func UserPaymentsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	tokenString := r.Header.Get("Authorization")
@@ -257,7 +253,7 @@ func UserPaymentsHandler(w http.ResponseWriter, r *http.Request) {
 	})
 	var res model.ResponseResult
 	var results []*model.Payment
-	collection, err := util.GetPaymentCollection()
+	collection, err := util.GetCollection("payments")
 	if err != nil {
 		res.Error = "Error, Try Again Later"
 		json.NewEncoder(w).Encode(res)
@@ -292,7 +288,6 @@ func UserPaymentsHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-// GetPaidDays given vehicle registration number...
 func GetPaidDays(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	//tokenString := r.Header.Get("Authorization")
@@ -307,7 +302,7 @@ func GetPaidDays(w http.ResponseWriter, r *http.Request) {
 	vehicleReg := params["vehicleReg"]
 	//var res model.ResponseResult
 	var results []*model.Payment
-	paymentCollection, err := util.GetPaymentCollection()
+	paymentCollection, err := util.GetCollection("payments")
 	if err != nil {
 		log.Println(err)
 	}
@@ -340,7 +335,6 @@ func GetPaidDays(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//VerificationHandler is...
 func VerificationHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -352,7 +346,7 @@ func VerificationHandler(w http.ResponseWriter, r *http.Request) {
 	var res model.ResponseResult
 
 	var vehicle model.Vehicle
-	vehicleCollection, err := util.GetVehicleCollection()
+	vehicleCollection, err := util.GetCollection("vehicles")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -364,7 +358,7 @@ func VerificationHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	collection, err := util.GetPaymentCollection()
+	collection, err := util.GetCollection("payments")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -394,14 +388,13 @@ func VerificationHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//UnpaidVehicleHistoryHandler is...
 func UnpaidVehicleHistoryHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var params = mux.Vars(r)
 	vehicleReg := params["vehicleReg"]
 	var res model.ResponseResult
 	var results []*model.Payment
-	paymentCollection, err := util.GetPaymentCollection()
+	paymentCollection, err := util.GetCollection("payments")
 	if err != nil {
 		res.Error = "Error, Try again later"
 		json.NewEncoder(w).Encode(res)
@@ -430,7 +423,6 @@ func UnpaidVehicleHistoryHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//ClampVehicle is...
 func ClampVehicle(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var params = mux.Vars(r)
@@ -440,7 +432,7 @@ func ClampVehicle(w http.ResponseWriter, r *http.Request) {
 	var vehicle model.Vehicle
 	//var res model.ResponseResult
 
-	vehicleCollection, err := util.GetVehicleCollection()
+	vehicleCollection, err := util.GetCollection("vehicles")
 	if err != nil {
 		log.Println(err)
 	}
@@ -454,7 +446,7 @@ func ClampVehicle(w http.ResponseWriter, r *http.Request) {
 	userID, _ := primitive.ObjectIDFromHex(uID)
 
 	var user model.User
-	userCollection, err := util.GetUserCollection()
+	userCollection, err := util.GetCollection("users")
 	if err != nil {
 		log.Println(err)
 	}
@@ -481,5 +473,13 @@ func ClampVehicle(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 	fmt.Println(smsResponse)
+	timerMessage := emoji.Sprint(":alarm_clock:")
+	util.Log("Clamp timer started" + timerMessage)
+	clampTimer := time.NewTimer(30 * time.Second)
+	<-clampTimer.C
+	util.Log("Clamp timer ended" + timerMessage)
+	//TODO: Send notification to attendants
+	//Send message(In case update was not successful)...
+	util.SendNotifications("result.FCMToken", "The vehicle has not yet been paid , Please clamp!")
 
 }

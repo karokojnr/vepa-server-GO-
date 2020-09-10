@@ -31,7 +31,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	collection, err := util.GetUserCollection()
+	collection, err := util.GetCollection("users")
 
 	if err != nil {
 		res.Error = err.Error()
@@ -111,7 +111,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
-	collection, err := util.GetUserCollection()
+	collection, err := util.GetCollection("users")
 
 	if err != nil {
 		log.Fatal(err)
@@ -174,7 +174,7 @@ func ProfileHandler(w http.ResponseWriter, r *http.Request) {
 	id, _ := primitive.ObjectIDFromHex(userid)
 	var user model.User
 	var res model.ResponseResult
-	collection, err := util.GetUserCollection()
+	collection, err := util.GetCollection("users")
 	if err != nil {
 		res.Error = err.Error()
 		json.NewEncoder(w).Encode(res)
@@ -207,15 +207,11 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return []byte("secret"), nil
 	})
-	// var params = mux.Vars(r)
-	// //Get id from parameters
-	// vehicleid := params["id"]
-	// id, _ := primitive.ObjectIDFromHex(vehicleid)
+
 	var user model.User
 	var res model.ResponseResult
-	// body, _ := ioutil.ReadAll(r.Body)
-	// err = json.Unmarshal(body, &user)
-	collection, err := util.GetUserCollection()
+
+	collection, err := util.GetCollection("users")
 	if err != nil {
 		res.Error = err.Error()
 		json.NewEncoder(w).Encode(res)
@@ -268,7 +264,8 @@ func FCMTokenHandler(w http.ResponseWriter, r *http.Request) {
 	var res model.ResponseResult
 	body, _ := ioutil.ReadAll(r.Body)
 	err := json.Unmarshal(body, &user)
-	collection, err := util.GetUserCollection()
+	collection, err := util.GetCollection("users")
+
 	if err != nil {
 		res.Error = err.Error()
 		json.NewEncoder(w).Encode(res)

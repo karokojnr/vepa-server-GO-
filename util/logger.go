@@ -35,4 +35,3 @@ func Log(msg ...interface{}) {
 	msg = append(msg, "\n----------------------------")
 	log.Println(msg...)
 }
-

@@ -2,7 +2,6 @@ package model
 
 import "go.mongodb.org/mongo-driver/bson/primitive"
 
-// Payment is...
 type Payment struct {
 	PaymentID          primitive.ObjectID `bson:"_id" json:"_id,omitempty"`
 	Days               []interface{}      `bson:"days" json:"days"`

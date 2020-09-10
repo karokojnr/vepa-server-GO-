@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 )
-// GetPort from the environment
 func GetPort() string {
 	var port = os.Getenv("PORT")
 	// Set a default port if there is nothing in the environment

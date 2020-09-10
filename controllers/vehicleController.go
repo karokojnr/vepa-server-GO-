@@ -32,7 +32,7 @@ func AddVehicleHandler(w http.ResponseWriter, r *http.Request) {
 	var res model.ResponseResult
 	body, _ := ioutil.ReadAll(r.Body)
 	err = json.Unmarshal(body, &vehicle)
-	collection, err := util.GetVehicleCollection()
+	collection, err := util.GetCollection("vehicles")
 	if err != nil {
 		res.Error = err.Error()
 		json.NewEncoder(w).Encode(res)
@@ -82,9 +82,7 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 	id, _ := primitive.ObjectIDFromHex(vehicleid)
 	var vehicle model.Vehicle
 	var res model.ResponseResult
-	// body, _ := ioutil.ReadAll(r.Body)
-	// err = json.Unmarshal(body, &vehicle)
-	collection, err := util.GetVehicleCollection()
+	collection, err := util.GetCollection("vehicles")
 	if err != nil {
 		res.Error = err.Error()
 		json.NewEncoder(w).Encode(res)
@@ -111,10 +109,6 @@ func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 		vehicle.VeicleID = id
 
 		json.NewEncoder(w).Encode(vehicle)
-		// log.Println("Past could not update!")
-		// res.Result = "Vehicle updated successfully"
-		// // json.NewEncoder(w).Encode(res)
-		// json.NewEncoder(w).Encode(res)
 		return
 	}
 }
@@ -132,7 +126,7 @@ func UserVehiclesHandler(w http.ResponseWriter, r *http.Request) {
 	})
 	var res model.ResponseResult
 	var results []*model.Vehicle
-	collection, err := util.GetVehicleCollection()
+	collection, err := util.GetCollection("vehicles")
 	if err != nil {
 		res.Error = "Error, Try Again Later"
 		json.NewEncoder(w).Encode(res)
@@ -140,7 +134,6 @@ func UserVehiclesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		userID := claims["id"].(string)
-		// userID, _ := primitive.ObjectIDFromHex(id)
 		filter := bson.M{"userId": userID}
 		cur, err := collection.Find(context.TODO(), filter)
 		if err != nil {
@@ -181,7 +174,7 @@ func DeleteVehicleHandler(w http.ResponseWriter, r *http.Request) {
 	//Get id from parameters
 	vehicleid := params["id"]
 	id, _ := primitive.ObjectIDFromHex(vehicleid)
-	vehicleCollection, err := util.GetVehicleCollection()
+	vehicleCollection, err := util.GetCollection("vehicles")
 	if err != nil {
 		fmt.Println(err)
 		return
