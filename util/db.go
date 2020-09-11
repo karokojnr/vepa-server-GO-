@@ -16,13 +16,13 @@ func GetCollection(collectionName string) (*mongo.Collection, error) {
 	if err != nil {
 		return nil, err
 	}
-	log.Println("---Client Type---")
-	log.Println(reflect.TypeOf(client))
+	//log.Println("---Client Type---")
+	//log.Println(reflect.TypeOf(client))
 
 	//var collection *mongo.Collection
 	//c *mongo.Database
-	db := client.Database("vepadb")
-	collection := db.Collection(collectionName)
+	//db := client.Database("vepadb")
+	collection := client.Database("vepadb").Collection(collectionName)
 	return collection, nil
 
 }
