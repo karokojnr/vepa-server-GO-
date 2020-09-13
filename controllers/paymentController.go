@@ -56,7 +56,7 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(res)
 		pID := payment.PaymentID.Hex()
 		//INITIALIZE STK PUSH...
-		//TODO: NOT being call sometimes
+		//TODO: NOT being called sometimes
 		GetPushHandler(userID, pID)
 		// STK PUSH INITIALIZED
 		//log.Println("stk push was initialized")
@@ -479,7 +479,6 @@ func ClampVehicle(w http.ResponseWriter, r *http.Request) {
 	<-clampTimer.C
 	util.Log("Clamp timer ended" + timerMessage)
 	//TODO: Send notification to attendants
-	//Send message(In case update was not successful)...
+	//Send message to attendants(In case update was not successful)...
 	util.SendNotifications("result.FCMToken", "The vehicle has not yet been paid , Please clamp!")
-
 }
