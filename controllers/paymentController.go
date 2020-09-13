@@ -101,7 +101,7 @@ func GetPushHandler(userID string, pID string) {
 		PartyA:            rUser.PhoneNumber,
 		PartyB:            "174379",
 		PhoneNumber:       rUser.PhoneNumber,
-		CallBackURL:       "http://quebasetech.co.ke:5000/rcb?id=" + userID + "&paymentid=" + pID, //CallBackHandler
+		CallBackURL:       "http://34.121.65.106:3500/rcb?id=" + userID + "&paymentid=" + pID, //CallBackHandler
 		AccountReference:  "Vepa",
 		TransactionDesc:   "Vepa Payment",
 	})

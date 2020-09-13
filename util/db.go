@@ -4,8 +4,6 @@ import (
 	"context"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"log"
-	"reflect"
 	"time"
 )
 
@@ -16,12 +14,7 @@ func GetCollection(collectionName string) (*mongo.Collection, error) {
 	if err != nil {
 		return nil, err
 	}
-	//log.Println("---Client Type---")
-	//log.Println(reflect.TypeOf(client))
-
-	//var collection *mongo.Collection
-	//c *mongo.Database
-	//db := client.Database("vepadb")
+	Log("MONGO CONNECTED")
 	collection := client.Database("vepadb").Collection(collectionName)
 	return collection, nil
 

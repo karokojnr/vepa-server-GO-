@@ -9,8 +9,8 @@ import (
 )
 
 func InitLogger() {
-	logFolder := os.Getenv("LOG_FOLDER")
-	appName := os.Getenv("APP_NAME")
+	logFolder := GoDotEnvVariable("LOG_FOLDER")
+	appName := GoDotEnvVariable("APP_NAME")
 	pwd, err := os.Getwd()
 	logFile := fmt.Sprintf("%s/%s/%s-%s.log", pwd, logFolder, appName, "%Y-%m-%d")
 	logFileLink := fmt.Sprintf("%s/%s/%s.log", pwd, logFolder, appName)
