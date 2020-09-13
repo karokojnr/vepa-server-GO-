@@ -54,12 +54,12 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println("Payment Added Successfully")
 		res.Result = "Payment Added Successfully"
 		json.NewEncoder(w).Encode(res)
-
 		pID := payment.PaymentID.Hex()
 		//INITIALIZE STK PUSH...
+		//TODO: NOT being call sometimes
 		GetPushHandler(userID, pID)
 		// STK PUSH INITIALIZED
-		log.Println("stk push was initialized")
+		//log.Println("stk push was initialized")
 	}
 	res.Error = "You are not Authorized!"
 	json.NewEncoder(w).Encode(res)
