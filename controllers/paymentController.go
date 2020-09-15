@@ -68,6 +68,7 @@ func PaymentHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetPushHandler(userID string, pID string) {
+	util.Log("GetPushHandler Initialized...")
 	id, _ := primitive.ObjectIDFromHex(userID)
 	filter := bson.M{"_id": id}
 	// Get user to know the USER PHONE NUMBER
@@ -118,7 +119,8 @@ func GetPushHandler(userID string, pID string) {
 	rCodeString := fmt.Sprintf("%v", rCode)
 	rMessage := mresMap["ResponseDescription"]
 	cMessage := mresMap["CustomerMessage"]
-	log.Println(cMessage)
+	//log.Println(cMessage)
+	util.Log(cMessage)
 
 	// Send error message(notification) if rCode != 0
 	if rCodeString == string('0') {
@@ -231,6 +233,27 @@ func CallBackHandler(w http.ResponseWriter, r *http.Request) {
 		util.SendNotifications(result.FCMToken, resultDesc)
 		res.Result = "Payment updated"
 		json.NewEncoder(w).Encode(res)
+
+		//-----Update is Waiting Clamp & isClamped in Vehicle-----
+		vehicleCollection, err := util.GetCollection("vehicles")
+		if err != nil {
+			log.Fatal(err)
+		}
+		var vehicleModel model.Vehicle
+		vehicleFilter := bson.M{"registrationNumber": paymentModel.VehicleReg}
+		vehicleUpdate := bson.M{"$set": bson.M{
+			"isWaitingClamp": false,
+			"isClamped":      false,
+		}}
+		err = vehicleCollection.FindOneAndUpdate(context.TODO(), vehicleFilter, vehicleUpdate).Decode(&vehicleModel)
+		if err != nil {
+			util.Log("Error fetching payment:", err.Error())
+			fmt.Printf("error...")
+			return
+
+		}
+		util.Log("vehicle paid")
+		//------------------------------------------------------------//
 		return
 	}
 	util.Log("Payment no successful")
@@ -444,6 +467,8 @@ func ClampVehicle(w http.ResponseWriter, r *http.Request) {
 	//Find userID to get the phone number
 	uID := vehicle.UserID
 	userID, _ := primitive.ObjectIDFromHex(uID)
+	vID := vehicle.VeicleID
+	//vehicleID, _ := primitive.ObjectIDFromHex(vID)
 
 	var user model.User
 	userCollection, err := util.GetCollection("users")
@@ -468,17 +493,48 @@ func ClampVehicle(w http.ResponseWriter, r *http.Request) {
 	plus := "+"
 
 	//Send SMS - REPLACE Recipient and Message with REAL Values
-	smsResponse, err := smsService.Send("", plus+userPhoneNumber, "Hello, Your have not paid for your vehicle. It will be clamped in 30 minutes incase you don't pay. Kindly make a payment now. ")
+	smsResponse, err := smsService.Send("", plus+userPhoneNumber, "Hello, Your have not paid for your vehicle("+vehicleReg+"). It will be clamped in 30 minutes incase you don't pay. Kindly make a payment now. ")
 	if err != nil {
 		fmt.Println(err)
 	}
 	fmt.Println(smsResponse)
+	//------------isWaitingClamp==true----------//
+	vehicleFilter := bson.M{"_id": vID}
+	vehicleUpdate := bson.M{"$set": bson.M{
+		"isWaitingClamp": true,
+	}}
+	var vehicleModel model.Vehicle
+	err = vehicleCollection.FindOneAndUpdate(context.TODO(), vehicleFilter, vehicleUpdate).Decode(&vehicleModel)
+	if err != nil {
+		util.Log("Error fetching payment:", err.Error())
+		fmt.Printf("error...")
+		return
+
+	}
+	util.Log("isWaitingClamp == true")
+	//--------------------------------------------//
 	timerMessage := emoji.Sprint(":alarm_clock:")
 	util.Log("Clamp timer started" + timerMessage)
-	clampTimer := time.NewTimer(30 * time.Second)
-	<-clampTimer.C
+	//clampTimer := time.NewTimer(30 * time.Second)
+	//<-clampTimer.C
+	time.Sleep(60 * time.Second)
 	util.Log("Clamp timer ended" + timerMessage)
+	//------------isClamped==true----------//
+	vehicleClampFilter := bson.M{"_id": vID}
+	vehicleClampUpdate := bson.M{"$set": bson.M{
+		"isClamped":      true,
+		"isWaitingClamp": false,
+	}}
+	err = vehicleCollection.FindOneAndUpdate(context.TODO(), vehicleClampFilter, vehicleClampUpdate).Decode(&vehicleModel)
+	if err != nil {
+		util.Log("Error fetching payment:", err.Error())
+		fmt.Printf("error...")
+		return
+	}
+	util.Log("isClamped == true")
+	//--------------------------------------------//
 	//TODO: Send notification to attendants
 	//Send message to attendants(In case update was not successful)...
-	util.SendNotifications("result.FCMToken", "The vehicle has not yet been paid , Please clamp!")
+	util.SendNotifications("fi3ytpKGhRo:APA91bFqPPPFnpeQo2BRxB0NKTMfGxmaZNwX0XNu4NnJsz7inArbgrkDihHJF_om46NW2Bd-1pwHHZmOiV03s2hSZ_XLm2EkbxxOmwH9KukPaaZeq_0dSXe5giGCeD3s924XZDkMDfLv", "The vehicle has not yet been paid , Please clamp!")
+
 }

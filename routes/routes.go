@@ -30,6 +30,9 @@ func Routes() {
 	r.HandleFunc("/verifyPayment/{vehicleReg}", controllers.VerificationHandler).Methods("GET")
 	r.HandleFunc("/unpaidVehicleHistory/{vehicleReg}", controllers.UnpaidVehicleHistoryHandler).Methods("GET")
 	r.HandleFunc("/clampVehicle/{vehicleReg}", controllers.ClampVehicle).Methods("GET")
+	r.HandleFunc("/saveFCM", controllers.SaveAttendantsFCM).Methods("PUT")
+	r.HandleFunc("/isWaitingClamp", controllers.VehiclesWaitingClamp).Methods("GET")
+	r.HandleFunc("/isClamped", controllers.ClampedVehicles).Methods("GET")
 
 	port := util.GetPort()
 

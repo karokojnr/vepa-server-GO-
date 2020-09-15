@@ -7,4 +7,6 @@ type Vehicle struct {
 	RegistrationNumber string             `bson:"registrationNumber" json:"registrationNumber"`
 	VehicleClass       string             `bson:"vehicleClass" json:"vehicleClass"`
 	UserID             string             `bson:"userId" json:"userId"`
+	IsWaitingClamp     bool               `bson:"isWaitingClamp" json:"isWaitingClamp"`
+	IsClamped          bool               `bson:"isClamped" json:"isClamped"`
 }

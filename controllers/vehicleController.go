@@ -42,6 +42,8 @@ func AddVehicleHandler(w http.ResponseWriter, r *http.Request) {
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		vehicle.UserID = claims["id"].(string)
 		vehicle.VeicleID = primitive.NewObjectID()
+		vehicle.IsWaitingClamp = false
+		vehicle.IsClamped = false
 		err = collection.FindOne(context.TODO(), bson.M{"registrationNumber": vehicle.RegistrationNumber}).Decode(&result)
 		if err != nil {
 			if err.Error() == "mongo: no documents in result" {
@@ -194,4 +196,65 @@ func DeleteVehicleHandler(w http.ResponseWriter, r *http.Request) {
 
 	}
 
+}
+func VehiclesWaitingClamp(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var vehicles []*model.Vehicle
+	vehicleColection, err := util.GetCollection("vehicles")
+	if err != nil {
+		log.Println(err)
+	}
+	vehicleFilter := bson.M{
+		"isWaitingClamp": true,
+		"isClamped":      false,
+	}
+	cur, err := vehicleColection.Find(context.TODO(), vehicleFilter)
+	if err != nil {
+		log.Println(err)
+	}
+	for cur.Next(context.TODO()) {
+		var elem model.Vehicle
+		err := cur.Decode(&elem)
+		if err != nil {
+			log.Fatal(err)
+		}
+		vehicles = append(vehicles, &elem)
+	}
+	if err := cur.Err(); err != nil {
+		log.Fatal(err)
+	}
+	_ = cur.Close(context.TODO())
+	json.NewEncoder(w).Encode(vehicles)
+	return
+}
+
+func ClampedVehicles(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var vehicles []*model.Vehicle
+	vehicleColection, err := util.GetCollection("vehicles")
+	if err != nil {
+		log.Println(err)
+	}
+	vehicleFilter := bson.M{
+		"isClamped":      true,
+		"isWaitingClamp": false,
+	}
+	cur, err := vehicleColection.Find(context.TODO(), vehicleFilter)
+	if err != nil {
+		log.Println(err)
+	}
+	for cur.Next(context.TODO()) {
+		var elem model.Vehicle
+		err := cur.Decode(&elem)
+		if err != nil {
+			log.Fatal(err)
+		}
+		vehicles = append(vehicles, &elem)
+	}
+	if err := cur.Err(); err != nil {
+		log.Fatal(err)
+	}
+	_ = cur.Close(context.TODO())
+	json.NewEncoder(w).Encode(vehicles)
+	return
 }
