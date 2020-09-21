@@ -323,15 +323,11 @@ func GetPaidDays(w http.ResponseWriter, r *http.Request) {
 	//})
 	var params = mux.Vars(r)
 	vehicleReg := params["vehicleReg"]
-	//var res model.ResponseResult
 	var results []*model.Payment
 	paymentCollection, err := util.GetCollection("payments")
 	if err != nil {
 		log.Println(err)
 	}
-
-	//if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-	//userID := claims["id"].(string)
 	filter := bson.M{"vehicleReg": vehicleReg, "isSuccessful": true}
 	cur, err := paymentCollection.Find(context.TODO(), filter)
 	if err != nil {
@@ -351,10 +347,29 @@ func GetPaidDays(w http.ResponseWriter, r *http.Request) {
 	_ = cur.Close(context.TODO())
 	json.NewEncoder(w).Encode(results)
 	return
-	//}
-	//res.Error = err.Error()
-	//json.NewEncoder(w).Encode(res)
-	//return
+
+}
+
+func CheckVehicleClamp(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var params = mux.Vars(r)
+	vehicleReg := params["vehicleReg"]
+	//Check if vehicle has been clamped
+	var vehicleModel model.Vehicle
+	var res model.ResponseResult
+	vehicleCollection, err := util.GetCollection("vehicles")
+	if err != nil {
+		log.Println(err)
+	}
+	vehicleFilter := bson.M{"registrationNumber": vehicleReg, "isClamped": true}
+	err = vehicleCollection.FindOne(context.TODO(), vehicleFilter).Decode(&vehicleModel)
+	if err != nil {
+		json.NewEncoder(w).Encode(vehicleModel)
+		return
+	}
+	res.Error = "clamped"
+	json.NewEncoder(w).Encode(res)
+	return
 
 }
 
@@ -491,7 +506,17 @@ func ClampVehicle(w http.ResponseWriter, r *http.Request) {
 	//Call the Gateway, and pass the constants here!
 	smsService := sms.NewService(username, apiKey, env)
 	plus := "+"
+	var vehicleModel model.Vehicle
+	var result1 model.Vehicle
+	var res model.ResponseResult
+	err = vehicleCollection.FindOne(context.TODO(), bson.M{"registrationNumber": vehicleReg}).Decode(&result1)
+	if result1.IsWaitingClamp == true || result1.IsClamped == true {
+		util.Log("vehicle is already  clamped")
+		res.Error = "vehicle is already clamped"
+		json.NewEncoder(w).Encode(res)
+		return
 
+	}
 	//Send SMS - REPLACE Recipient and Message with REAL Values
 	smsResponse, err := smsService.Send("", plus+userPhoneNumber, "Hello, Your have not paid for your vehicle("+vehicleReg+"). It will be clamped in 30 minutes incase you don't pay. Kindly make a payment now. ")
 	if err != nil {
@@ -499,39 +524,56 @@ func ClampVehicle(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Println(smsResponse)
 	//------------isWaitingClamp==true----------//
-	vehicleFilter := bson.M{"_id": vID}
-	vehicleUpdate := bson.M{"$set": bson.M{
-		"isWaitingClamp": true,
-	}}
-	var vehicleModel model.Vehicle
-	err = vehicleCollection.FindOneAndUpdate(context.TODO(), vehicleFilter, vehicleUpdate).Decode(&vehicleModel)
-	if err != nil {
-		util.Log("Error fetching payment:", err.Error())
-		fmt.Printf("error...")
-		return
+	if result1.IsWaitingClamp == false || result1.IsClamped == false {
+		vehicleFilter := bson.M{"_id": vID}
+		vehicleUpdate := bson.M{"$set": bson.M{
+			"isWaitingClamp": true,
+		}}
+		err = vehicleCollection.FindOneAndUpdate(context.TODO(), vehicleFilter, vehicleUpdate).Decode(&vehicleModel)
+		if err != nil {
+			util.Log("Error updating payment:", err.Error())
+			fmt.Printf("error...")
+			return
 
+		}
+		util.Log("isWaitingClamp == true")
+		res.Result = "isWaitingClamp updated Successfully"
+		json.NewEncoder(w).Encode(res)
+		//return
 	}
-	util.Log("isWaitingClamp == true")
+
 	//--------------------------------------------//
+
 	timerMessage := emoji.Sprint(":alarm_clock:")
 	util.Log("Clamp timer started" + timerMessage)
 	//clampTimer := time.NewTimer(30 * time.Second)
 	//<-clampTimer.C
 	time.Sleep(60 * time.Second)
 	util.Log("Clamp timer ended" + timerMessage)
+
 	//------------isClamped==true----------//
-	vehicleClampFilter := bson.M{"_id": vID}
-	vehicleClampUpdate := bson.M{"$set": bson.M{
-		"isClamped":      true,
-		"isWaitingClamp": false,
-	}}
-	err = vehicleCollection.FindOneAndUpdate(context.TODO(), vehicleClampFilter, vehicleClampUpdate).Decode(&vehicleModel)
-	if err != nil {
-		util.Log("Error fetching payment:", err.Error())
-		fmt.Printf("error...")
-		return
+	var result2 model.Vehicle
+	err = vehicleCollection.FindOne(context.TODO(), bson.M{"registrationNumber": vehicleReg}).Decode(&result2)
+	if result2.IsClamped == false {
+		vehicleClampFilter := bson.M{"_id": vID}
+		vehicleClampUpdate := bson.M{"$set": bson.M{
+			"isClamped":      true,
+			"isWaitingClamp": false,
+		}}
+		err = vehicleCollection.FindOneAndUpdate(context.TODO(), vehicleClampFilter, vehicleClampUpdate).Decode(&vehicleModel)
+		if err != nil {
+			util.Log("Error fetching payment:", err.Error())
+			fmt.Printf("error...")
+			return
+		}
+		util.Log("isClamped == true")
+		res.Result = "isClamped updated Successfully"
+		json.NewEncoder(w).Encode(res)
+		//return
 	}
-	util.Log("isClamped == true")
+	//util.Log("vehicle has already been clamped")
+	//res.Error = "vehicle has already been clamped"
+	//json.NewEncoder(w).Encode(res)
 	//--------------------------------------------//
 	//TODO: Send notification to attendants
 	//Send message to attendants(In case update was not successful)...
