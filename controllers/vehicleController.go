@@ -66,8 +66,29 @@ func AddVehicleHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(res)
 	return
 }
+func GetVehicleHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var params = mux.Vars(r)
+	//Get id from parameters
+	vehicleReg := params["vehicleReg"]
+	//id, _ := primitive.ObjectIDFromHex(vehicleid)
+	var vehicleModel model.Vehicle
+	var res model.ResponseResult
+	vehicleCollection, err := util.GetCollection("vehicles")
+	if err != nil {
+		res.Error = err.Error()
+		json.NewEncoder(w).Encode(res)
+		return
+	}
+	err = vehicleCollection.FindOne(context.TODO(), bson.M{"registrationNumber": vehicleReg}).Decode(&vehicleModel)
+	if err != nil {
+		log.Println(err)
+	}
+	json.NewEncoder(w).Encode(vehicleModel)
+	return
 
-// EditVehicleHandler is...
+}
+
 func EditVehicleHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	tokenString := r.Header.Get("Authorization")
@@ -161,7 +182,6 @@ func UserVehiclesHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-//DeleteVehicleHandler is...
 func DeleteVehicleHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	tokenString := r.Header.Get("Authorization")
@@ -174,8 +194,9 @@ func DeleteVehicleHandler(w http.ResponseWriter, r *http.Request) {
 	})
 	var params = mux.Vars(r)
 	//Get id from parameters
-	vehicleid := params["id"]
-	id, _ := primitive.ObjectIDFromHex(vehicleid)
+	vehicleID := params["id"]
+	var res model.ResponseResult
+	id, _ := primitive.ObjectIDFromHex(vehicleID)
 	vehicleCollection, err := util.GetCollection("vehicles")
 	if err != nil {
 		fmt.Println(err)
@@ -184,15 +205,26 @@ func DeleteVehicleHandler(w http.ResponseWriter, r *http.Request) {
 	if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		// prepare filter.
 		filter := bson.M{"_id": id}
-
-		deleteResult, err := vehicleCollection.DeleteOne(context.TODO(), filter)
-
+		var result model.Vehicle
+		err = vehicleCollection.FindOne(context.TODO(), filter).Decode(&result)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
+		}
+		util.Log("Vehicle to be deleted found - ", result.RegistrationNumber)
+		if result.IsClamped == false {
+			deleteResult, err := vehicleCollection.DeleteOne(context.TODO(), filter)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			util.Log("Deleted Vehicle")
+			json.NewEncoder(w).Encode(deleteResult)
 			return
 		}
-
-		json.NewEncoder(w).Encode(deleteResult)
+		util.Log("Vehicle Clamped! Deletion not allowed")
+		res.Error = "clamped"
+		json.NewEncoder(w).Encode(res)
+		return
 
 	}
 
