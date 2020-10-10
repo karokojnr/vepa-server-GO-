@@ -1,0 +1,112 @@
+{{ template "header.html" .}}
+
+<!-- Dashboard Container -->
+<div class="dashboard-container">
+
+    {{ template "sidebar.html" .}}
+
+    <!-- Dashboard Content
+    ================================================== -->
+    <div class="dashboard-content-container" data-simplebar>
+        <div class="dashboard-content-inner">
+
+            <!-- Dashboard Headline -->
+            <div class="dashboard-headline">
+                <h3>Post a Job</h3>
+
+                <!-- Breadcrumbs -->
+                <nav id="breadcrumbs" class="dark">
+                    <ul>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Dashboard</a></li>
+                        <li>Add Attendant</li>
+                    </ul>
+                </nav>
+            </div>
+
+            <!-- Row -->
+            <div class="row">
+
+                <!-- Dashboard Box -->
+                <div class="col-xl-12">
+                    <div class="dashboard-box margin-top-0">
+
+                        <!-- Headline -->
+                        <div class="headline">
+                            <h3><i class="icon-feather-folder-plus"></i> Attendant Submission Form</h3>
+                        </div>
+                        <form action="/dashboard/postAddAttendant" enctype="multipart/form-data" method="POST">
+
+                            <div class="content with-padding padding-bottom-10">
+                                <div class="row">
+
+                                    <div class="col-xl-4">
+                                        <div class="submit-field">
+                                            <h5>Firstname</h5>
+                                            <input type="text" class="with-border" name="firstName" id="firstName">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xl-4">
+                                        <div class="submit-field">
+                                            <h5>Lastname</h5>
+                                            <input type="text" class="with-border" name="lastName" id="lastName">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xl-4">
+                                        <div class="submit-field">
+                                            <h5>Email</h5>
+                                            <input type="text" class="with-border" name="email" id="email">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xl-4">
+                                        <div class="submit-field">
+                                            <h5>ID Number</h5>
+                                            <input type="text" class="with-border" name="idNumber" id="idNumber">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xl-4">
+                                        <div class="submit-field">
+                                            <h5>Phone Number</h5>
+                                            <input type="text" class="with-border" name="phoneNumber" id="phoneNumber">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xl-4">
+                                        <div class="submit-field">
+                                            <h5>Password</h5>
+                                            <input type="text" class="with-border" name="password" id="password">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xl-4">
+                                        <div class="submit-field">
+                                            <h5>Confirm Password</h5>
+                                            <input type="text" class="with-border" name="confirm-password"
+                                                   id="confirm-password">
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-xl-12">
+                                <button type="submit" class="button ripple-effect big margin-top-30"><i
+                                            class="icon-feather-plus"></i> Add
+                                    Attendant
+                                </button>
+                                {{/*                                <a href="/dashboard/postAddAttendant" class="button ripple-effect big margin-top-30"><i*/}}
+                                {{/*                                            class="icon-feather-plus"></i> Add*/}}
+                                {{/*                                    Attendant</a>*/}}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+
+            </div>
+            <!-- Row / End -->
+
+            {{ template "footer.html" .}}
