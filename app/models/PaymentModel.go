@@ -10,7 +10,7 @@ type Payment struct {
 	MpesaReceiptNumber string             `bson:"mpesaReceiptNumber" json:"mpesaReceiptNumber"`
 	ResultCode         interface{}        `bson:"resultCode" json:"resultCode"`
 	ResultDesc         string             `bson:"resultDesc" json:"resultDesc"`
-	TransactionDate    int                `bson:"transactionDate" json:"transactionDate"`
+	TransactionDate    interface{}                `bson:"transactionDate" json:"transactionDate"`
 	PhoneNumber        string             `bson:"phoneNumber" json:"phoneNumber"`
 	CheckoutRequestID  string             `bson:"checkoutRequestID" json:"checkoutRequestID"`
 	IsSuccessful       bool               `bson:"isSuccessful" json:"isSuccessful"`

@@ -1,40 +1,43 @@
 package controllers
 
 import (
-	"fmt"
+	"context"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
-	"gopkg.in/mgo.v2"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	model "vepa/app/models"
+	"vepa/app/util"
 )
 
-const FCMTokenCollection = "fcmtoken"
+func SaveAttendantsFCMHandler(c *gin.Context) {
+	ctx := context.TODO()
+	attendantCollection, err := util.GetCollection("attendants")
 
-func SaveAttendantsFCM(c *gin.Context) {
-	//db := *MongoConfig()
-	db := c.MustGet("db").(*mgo.Database)
-	fmt.Println("MONGO RUNNING...", db)
-
-	fcmToken := model.FCMToken{}
-	err := c.Bind(&fcmToken)
 	if err != nil {
-		c.JSON(200, gin.H{
-			"message": "Error Getting Body",
-		})
+		util.SendError(c, "Cannot get attendant collection")
 		return
 	}
-	filter := bson.M{}
-	update := bson.M{"$set": bson.M{"fcmtoken": fcmToken.FCMToken}}
-	err = db.C(FCMTokenCollection).Update(filter, update)
+
+	attendant := model.User{}
+	attendantID := c.Param("id")
+	id, _ := primitive.ObjectIDFromHex(attendantID)
+	err = c.Bind(&attendant)
+
 	if err != nil {
-		c.JSON(200, gin.H{
-			"message": "Error Updating FCMToken",
-		})
+		util.SendError(c, "Error Getting Body")
 		return
 	}
+	filter := bson.M{"_id": id}
+	update := bson.M{"$set": bson.M{"fcmtoken": attendant.FCMToken}}
+	_, err = attendantCollection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		util.SendError(c, "Error Updating FCMToken")
+		return
+	}
+
 	c.JSON(200, gin.H{
 		"message": "Success Updating FCMToken",
-		//"user":    &user,
+		//"attendant":    &attendant,
 	})
-
+	return
 }

@@ -1,7 +1,9 @@
 package routes
 
 import (
+	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
+
 	"log"
 	"net/http"
 	"vepa/app/controllers"
@@ -10,6 +12,9 @@ import (
 
 func Routes() {
 	r := gin.Default()
+	// Session to use in auth
+	r.Use(sessions.Sessions("vepa_session", sessions.NewCookieStore([]byte(util.GoDotEnvVariable("SESSION_KEY")))))
+
 	// Server static files
 	r.Static("/assets", util.GoDotEnvVariable("APP_ASSETS"))
 
@@ -18,14 +23,23 @@ func Routes() {
 
 	//Routes
 	dashboardRouter := r.Group("/dashboard")
+	dashboardRouter.Use(util.AuthRequired())
+
 	{
 		dashboardRouter.GET("", controllers.GetDashboard)
 		dashboardRouter.GET("/getAttendants", controllers.GetAttendants)
+		dashboardRouter.GET("/getCustomers", controllers.GetCustomers)
 		dashboardRouter.GET("/getAddAttendant", controllers.GetAddAttendant)
+		//dashboardRouter.GET("/getAdminLogin", controllers.GetAdminLoginHandler)
 		dashboardRouter.POST("/postAddAttendant", controllers.PostAddAttendant)
-
+		//dashboardRouter.POST("/adminRegistration", controllers.RegisterAdminHandler)
+		//dashboardRouter.POST("/adminLogin", controllers.AdminLoginHandler)
 
 	}
+	r.POST("/auth/adminLogin", controllers.AdminLoginHandler)
+	r.GET("/auth/getAdminLogin", controllers.GetAdminLoginHandler)
+	r.GET("/logout", controllers.GetLogout)
+	r.POST("/auth/adminRegistration", controllers.RegisterAdminHandler)
 
 	//Users
 	r.POST("/register", controllers.RegisterHandler)
@@ -42,6 +56,7 @@ func Routes() {
 	r.GET("/isWaitingClamp", controllers.VehiclesWaitingClamp)
 	r.GET("/isClamped", controllers.ClampedVehicle)
 	r.GET("/isVehicleClamped/:vehicleReg", controllers.CheckIfVehicleIsClampedHandler)
+	r.GET("/nonRegisteredClamped", controllers.NonRegisteredClampedVehiclesHandler)
 	//Payment
 	r.POST("/makePayment", controllers.PaymentHandler)
 	r.POST("/rcb", controllers.CallBackHandler)
@@ -52,6 +67,10 @@ func Routes() {
 	r.GET("/clampVehicle/:vehicleReg", controllers.ClampVehicleHandler)
 	r.POST("/clearclampfee/:id", controllers.ClearClampFeeHandler)
 	r.POST("/clamprcb", controllers.ClampCallBackHandler)
+	//Attendant
+	r.POST("/attendantLogin", controllers.AttendantLoginHandler)
+	//FCM
+	r.PUT("/attendantToken/:id", controllers.SaveAttendantsFCMHandler)
 
 	port := util.GetPort()
 	util.Log("Starting app on port 👍 ✓ ⌛ :", port)

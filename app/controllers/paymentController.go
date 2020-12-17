@@ -99,7 +99,7 @@ func GetPushHandler(userID string, pID string) {
 		PartyA:            rUser.PhoneNumber,
 		PartyB:            "174379",
 		PhoneNumber:       rUser.PhoneNumber,
-		CallBackURL:       "http://34.121.65.106:3500/rcb?id=" + userID + "&paymentid=" + pID, //CallBackHandler
+		CallBackURL:       "http://34.74.123.231:3500/rcb?id=" + userID + "&paymentid=" + pID, //CallBackHandler
 		AccountReference:  "Vepa",
 		TransactionDesc:   "Vepa Payment",
 	})
@@ -189,7 +189,7 @@ func CallBackHandler(c *gin.Context) {
 	if resultCodeString == string('0') {
 		item = bd.(map[string]interface{})["Body"].(map[string]interface{})["stkCallback"].(map[string]interface{})["CallbackMetadata"].(map[string]interface{})["Item"]
 		mpesaReceiptNumber = item.([]interface{})[1].(map[string]interface{})["Value"]
-		transactionDate = item.([]interface{})[3].(map[string]interface{})["Value"]
+		transactionDate = item.([]interface{})[2].(map[string]interface{})["Value"]
 		//phoneNumber = item.([]interface{})[4].(map[string]interface{})["Value"]
 		phoneNumber := "+" + result.PhoneNumber
 		util.Log("item:", item)
@@ -359,6 +359,7 @@ func VerificationHandler(c *gin.Context) {
 	}
 	currentTime := time.Now().Local()
 	formatCurrentTime := currentTime.Format("2006-01-02")
+	//intCurrentTime,_ := strconv.Atoi(formatCurrentTime)
 
 	for i := range payment.Days {
 		if payment.Days[i] == formatCurrentTime {

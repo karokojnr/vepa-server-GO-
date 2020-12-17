@@ -5,28 +5,6 @@
         <script>document.write(new Date().getFullYear());</script>
         <strong>VEPA</strong>. All Rights Reserved.
     </div>
-    <ul class="footer-social-links">
-        <li>
-            <a href="#" title="Facebook" data-tippy-placement="top">
-                <i class="icon-brand-facebook-f"></i>
-            </a>
-        </li>
-        <li>
-            <a href="#" title="Twitter" data-tippy-placement="top">
-                <i class="icon-brand-twitter"></i>
-            </a>
-        </li>
-        <li>
-            <a href="#" title="Google Plus" data-tippy-placement="top">
-                <i class="icon-brand-google-plus-g"></i>
-            </a>
-        </li>
-        <li>
-            <a href="#" title="LinkedIn" data-tippy-placement="top">
-                <i class="icon-brand-linkedin-in"></i>
-            </a>
-        </li>
-    </ul>
     <div class="clearfix"></div>
 </div>
 <!-- Footer / End -->
@@ -90,6 +68,27 @@
 
 <!-- Scripts
 ================================================== -->
+<script>
+    function searchFunction() {
+        // Declare variables
+        var input, filter, ul, li, a, i, txtValue;
+        input = document.getElementById('searchInput');
+        filter = input.value.toUpperCase();
+        ul = document.getElementById("attendantsUL");
+        li = ul.getElementsByTagName('li');
+
+        // Loop through all list items, and hide those who don't match the search query
+        for (i = 0; i < li.length; i++) {
+            a = li[i].getElementsByTagName("a")[0];
+            txtValue = a.textContent || a.innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                li[i].style.display = "";
+            } else {
+                li[i].style.display = "none";
+            }
+        }
+    }
+</script>
 <script src="/assets/js/jquery-3.3.1.min.js"></script>
 <script src="/assets/js/jquery-migrate-3.0.0.min.js"></script>
 <script src="/assets/js/mmenu.min.js"></script>
@@ -123,77 +122,43 @@
 <!-- Chart.js // documentation: http://www.chartjs.org/docs/latest/ -->
 <script src="/assets/js/chart.min.js"></script>
 <script>
-    Chart.defaults.global.defaultFontFamily = "Nunito";
-    Chart.defaults.global.defaultFontColor = '#888';
-    Chart.defaults.global.defaultFontSize = '14';
-
-    var ctx = document.getElementById('chart').getContext('2d');
-
-    var chart = new Chart(ctx, {
-        type: 'line',
-
-        // The data for our dataset
+    var ctx = document.getElementById('chart');
+    var myChart = new Chart(ctx, {
+        type: 'bar',
         data: {
-            labels: ["January", "February", "March", "April", "May", "June"],
-            // Information about the dataset
+            labels: ['Users', 'Attendants', 'Registered Vehicles'],
             datasets: [{
-                label: "Views",
-                backgroundColor: 'rgba(42,65,232,0.08)',
-                borderColor: '#2a41e8',
-                borderWidth: "3",
-                data: [196, 132, 215, 362, 210, 252],
-                pointRadius: 5,
-                pointHoverRadius: 5,
-                pointHitRadius: 10,
-                pointBackgroundColor: "#fff",
-                pointHoverBackgroundColor: "#fff",
-                pointBorderWidth: "2",
+                label: 'VEPA Data',
+                data: [{{ .numOfCustomers }}, {{ .numOfAttendants }}, {{ .numOfVehicles }}],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)'
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                }
             }]
-        },
-
-        // Configuration options
-        options: {
-
-            layout: {
-                padding: 10,
-            },
-
-            legend: {display: false},
-            title: {display: false},
-
-            scales: {
-                yAxes: [{
-                    scaleLabel: {
-                        display: false
-                    },
-                    gridLines: {
-                        borderDash: [6, 10],
-                        color: "#d8d8d8",
-                        lineWidth: 1,
-                    },
-                }],
-                xAxes: [{
-                    scaleLabel: {display: false},
-                    gridLines: {display: false},
-                }],
-            },
-
-            tooltips: {
-                backgroundColor: '#333',
-                titleFontSize: 13,
-                titleFontColor: '#fff',
-                bodyFontColor: '#fff',
-                bodyFontSize: 13,
-                displayColors: false,
-                xPadding: 10,
-                yPadding: 10,
-                intersect: false
-            }
-        },
-
-
+        }
+    }
     });
-
 </script>
 
 </body>

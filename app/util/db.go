@@ -15,7 +15,7 @@ func GetCollection(collectionName string) (*mongo.Collection, error) {
 		return nil, err
 	}
 	Log("MONGO CONNECTED")
-	collection := client.Database("vepa_demo").Collection(collectionName)
+	collection := client.Database("vepa").Collection(collectionName)
 	return collection, nil
 
 }

@@ -244,5 +244,6 @@ func FCMTokenHandler(c *gin.Context) {
 		"message": "Success Updating FCMToken",
 		//"user":    &user,
 	})
+	return
 
 }

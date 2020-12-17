@@ -32,10 +32,19 @@
                         <div class="headline">
                             <h3><i class="icon-material-outline-supervisor-account"></i> {{ .len}} Candidates
                             </h3>
+
+                        </div>
+                        <div class="wrap">
+                            <div class="search">
+                                <input id="searchInput" type="text" class="searchTerm" onkeyup="searchFunction()" placeholder="Search Attendant">
+                                <button type="submit" class="searchButton">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </div>
                         </div>
 
                         <div class="content">
-                            <ul class="dashboard-box-list">
+                            <ul id="attendantsUL" class="dashboard-box-list">
                                 {{ range .attendants }}
 
                                     <li>
@@ -64,15 +73,13 @@
                                                     <span class="freelancer-detail-item"><i
                                                                 class="icon-feather-phone"></i> +{{ .PhoneNumber }}</span>
 
-                                                    {{/*                                                    <!-- Rating -->*/}}
-                                                    {{/*                                                    <div class="freelancer-rating">*/}}
-                                                    {{/*                                                        <div class="star-rating" data-rating="5.0"></div>*/}}
-                                                    {{/*                                                    </div>*/}}
-
                                                     <!-- Buttons -->
                                                     <div class="buttons-to-right always-visible margin-top-25 margin-bottom-5">
                                                         <a href="#" class="button ripple-effect"><i
                                                                     class="icon-line-awesome-pencil"></i> Update</a>
+                                                        <a href="#" class="button ripple-effect"><i
+                                                                    class="icon-line-awesome-exclamation-triangle"></i>
+                                                            Suspend</a>
                                                         <a href="#" class="button gray ripple-effect ico"
                                                            title="Remove Candidate" data-tippy-placement="top"><i
                                                                     class="icon-feather-trash-2"></i></a>

@@ -297,6 +297,38 @@ func ClampedVehicle(c *gin.Context) {
 	})
 	return
 }
+func NonRegisteredClampedVehiclesHandler(c *gin.Context) {
+	var vehicles []*model.ClampDetails
+	ctx := context.TODO()
+	clampDetailsCollection, err := util.GetCollection("clampdetails")
+	if err != nil {
+		util.SendError(c, "Cannot get clamp details collection")
+		return
+	}
+	vehicleFilter := bson.M{
+		"isCarRegistered": false,
+	}
+	cur, err := clampDetailsCollection.Find(ctx, vehicleFilter)
+	if err != nil {
+		log.Println(err)
+	}
+	for cur.Next(context.TODO()) {
+		var elem model.ClampDetails
+		err := cur.Decode(&elem)
+		if err != nil {
+			log.Fatal(err)
+		}
+		vehicles = append(vehicles, &elem)
+	}
+	if err := cur.Err(); err != nil {
+		log.Fatal(err)
+	}
+	_ = cur.Close(context.TODO())
+	c.JSON(200, gin.H{
+		"vehicles": vehicles,
+	})
+	return
+}
 func CheckIfVehicleIsClampedHandler(c *gin.Context) {
 	ctx := context.TODO()
 	vehicleCollection, err := util.GetCollection("vehicles")
