@@ -1,14 +1,8 @@
-version: "3"
-
+version: '3'
 services:
-  api:
+  app:
     container_name: vepa
-    build: ./
-    restart: unless-stopped
-#    volumes:
-#      - ./logs:/var/www/vepa/logs
-    env_file:
-      - ./docker.env
+    restart: always
+    build: .
     ports:
-      - "4000:4000"
-
+      - '80:4000'
