@@ -211,6 +211,7 @@ func GetDashboard(c *gin.Context) {
 	}
 	if err := vehicleCur.Err(); err != nil {
 		util.SendError(c, "Error!")
+
 		return
 	}
 	_ = vehicleCur.Close(context.TODO())
