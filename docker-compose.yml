@@ -5,8 +5,8 @@ services:
     container_name: vepa
     build: ./
     restart: unless-stopped
-#    volumes:
-#      - ./logs:/var/www/qpos/logs
+    volumes:
+      - ./logs:/var/www/vepa/logs
     env_file:
       - ./docker.env
     ports:
