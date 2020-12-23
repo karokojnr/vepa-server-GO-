@@ -1,31 +1,32 @@
-FROM golang:latest
 
-MAINTAINER karokojnr<karoko.jnr99@gmail.com>
+# Start from golang:1.15-alpine base image
+FROM golang:1.15-alpine
 
-#Move to working directory /build
-WORKDIR /build
+# The latest alpine images don't have some tools like (`git` and `bash`).
+# Adding git, bash and openssh to the image
+RUN apk update && apk upgrade && \
+    apk add --no-cache bash git openssh
 
-#copy and download dependencies using go mod
-COPY go.mod .
-COPY go.sum .
+# Add Maintainer Info
+LABEL maintainer="KAROKOJNR <karoko.jnr99@gmail.com>"
+
+# Set the Current Working Directory inside the container
+WORKDIR /app
+
+# Copy go mod and sum files
+COPY go.mod go.sum ./
+
+# Download all dependancies. Dependencies will be cached if the go.mod and go.sum files are not changed
 RUN go mod download
 
-#Copy the code into the container
+# Copy the source from the current directory to the Working Directory inside the container
 COPY . .
 
+#Expose port
 EXPOSE 4000
 
-#Build the application
+# Build the Go app
 RUN go build -o vepa .
 
-# Build a small image
-#FROM scratch
-## Copy app to the new image
-#COPY --from=builder /build/vepa /
-#
-## Move config file to new image
-#COPY --from=builder /build/docker.env /.env
-
-
-# Command to run
-ENTRYPOINT ["/vepa"]
+# Run the executable
+CMD ["./vepa"]
